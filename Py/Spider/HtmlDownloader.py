@@ -1,7 +1,6 @@
 # coding:utf-8
 
 import requests
-import pprint
 
 
 class HtmlDownloader:
@@ -9,12 +8,10 @@ class HtmlDownloader:
     key = '21_qv'
     auth = 'http://www.cwl.gov.cn/cwl_admin/stat/dealer?SiteID=21&CatalogInnerCode=000291000001000001&Type=null&sr=1366x768&cd=24&ce=1&la=zh-CN&cs=UTF-8&vq=1&Referer=http://www.cwl.gov.cn/&Title=%E5%BE%80%E6%9C%9F%E5%BC%80%E5%A5%96_%E4%B8%AD%E5%9B%BD%E7%A6%8F%E5%BD%A9%E7%BD%91&URL=http://www.cwl.gov.cn/kjxx/ssq/kjgg/&Host=www.cwl.gov.cn'
 
-    def __init__(self, ajaxUrl):
+    def __init__(self):
         """
             Constructor of HtmlDownloader.
-        :param ajxaUrl:  url to get data
         """
-        self.ajaxUrl = ajaxUrl
         self.headers = {"Accept": "application/json, text/javascript, */*; q=0.01",
                         "Host": "www.cwl.gov.cn",
                         "Referer": "http://www.cwl.gov.cn/kjxx/ssq/kjgg/",
@@ -33,7 +30,7 @@ class HtmlDownloader:
             if not self.domain:
                 self.domain = co.domain
 
-    def get_content(self):
+    def get_content(self, url):
         if not self.session.cookies.get(self.key):
             temp_cookie = requests.cookies.create_cookie(self.key, '1')
             temp_cookie.domain = self.domain
@@ -41,13 +38,14 @@ class HtmlDownloader:
         else:
             self.session.cookies.set(self.key, str(int(self.session.cookies.get(self.key)) + 1))
 
-        res = self.session.get(self.ajaxUrl)
+        res = self.session.get(url)
         res.encoding = 'utf-8'
+        import pprint
         pprint.pprint(res.text)
         return res.text
 
 
 if __name__ == "__main__":
-    downloader = HtmlDownloader(r"http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&issueCount=100")
+    downloader = HtmlDownloader()
     downloader.get_cookie()
-    downloader.get_content()
+    downloader.get_content(r"http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&issueCount=1")
