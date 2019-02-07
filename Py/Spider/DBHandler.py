@@ -28,7 +28,7 @@ class DbHandler:
         cur.execute('''SELECT * FROM record_details WHERE ID = ? AND TYPE = ? AND TYPE_NUM = ? AND 
             TYPE_MONEY = ?''', (identify, tp, type_num, money))
         if cur.fetchone():
-            return None
+            return
         cur.execute('''INSERT INTO record_details(ID, TYPE, TYPE_NUM, TYPE_MONEY) VALUES(
             ?, ?, ?, ?);''', (identify, tp, type_num, money))
         self.conn.commit()
