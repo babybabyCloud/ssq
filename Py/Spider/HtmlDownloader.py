@@ -1,7 +1,10 @@
 # coding:utf-8
 
 import requests
+import logging
 
+
+logger = logging.getLogger('log_default')
 
 class HtmlDownloader:
 
@@ -40,8 +43,6 @@ class HtmlDownloader:
 
         res = self.session.get(url)
         res.encoding = 'utf-8'
-        import pprint
-        pprint.pprint(res.text)
         return res.text
 
 

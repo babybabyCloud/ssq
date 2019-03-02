@@ -4,7 +4,13 @@ from HtmlDownloader import HtmlDownloader
 from DBHandler import DbHandler
 import configparser
 import json
+import sys
+import logging
+from logging.config import fileConfig
 
+
+fileConfig('logging.ini')
+logger = logging.getLogger('log_default')
 
 class Manager:
     def __init__(self):
@@ -29,6 +35,11 @@ class Manager:
 
 
 if __name__ == '__main__':
+    count = 100
+    if len(sys.argv) == 2:
+        count = sys.argv[1]
     manager = Manager()
-    manager.start(r"http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&issueCount=1")
+    url = r"http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&issueCount={}".format(count)
+    logger.info(url)
+    manager.start(url)
 
