@@ -1,5 +1,5 @@
 # coding:utf-8
-from __init__ import error_handler
+from Spider.decrator import error_handler
 import sqlite3
 
 

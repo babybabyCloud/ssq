@@ -1,7 +1,7 @@
 # coding:utf-8
 
-from HtmlDownloader import HtmlDownloader
-from DBHandler import DbHandler
+from Spider.HtmlDownloader import HtmlDownloader
+from Spider.DBHandler import DbHandler
 import configparser
 import json
 import sys
@@ -9,13 +9,13 @@ import logging
 from logging.config import fileConfig
 
 
-fileConfig('logging.ini')
+fileConfig('Spider/logging.ini')
 logger = logging.getLogger('log_default')
 
 class Manager:
     def __init__(self):
         self.conf = configparser.ConfigParser()
-        self.conf.read('config.ini', encoding='utf-8')
+        self.conf.read('Spider/config.ini', encoding='utf-8')
         self.downloader = HtmlDownloader()
         self.db = DbHandler(self.conf)
         self.urls = set()
@@ -33,8 +33,7 @@ class Manager:
                 for prize in item['prizegrades']:
                     self.db.insert_details(item['code'], prize['type'], prize['typenum'], prize['typemoney'])
 
-
-if __name__ == '__main__':
+def main():
     count = 100
     if len(sys.argv) == 2:
         count = sys.argv[1]
@@ -43,3 +42,5 @@ if __name__ == '__main__':
     logger.info(url)
     manager.start(url)
 
+if __name__ == '__main__':
+    main()
