@@ -1,52 +1,38 @@
 # coding:utf-8
 
-import requests
 import logging
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expected
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.keys import Keys
 
 
 logger = logging.getLogger('log_default')
 
-class HtmlDownloader:
 
-    key = '21_qv'
-    auth = 'http://www.cwl.gov.cn/cwl_admin/stat/dealer?SiteID=21&CatalogInnerCode=000291000001000001&Type=null&sr=1366x768&cd=24&ce=1&la=zh-CN&cs=UTF-8&vq=1&Referer=http://www.cwl.gov.cn/&Title=%E5%BE%80%E6%9C%9F%E5%BC%80%E5%A5%96_%E4%B8%AD%E5%9B%BD%E7%A6%8F%E5%BD%A9%E7%BD%91&URL=http://www.cwl.gov.cn/kjxx/ssq/kjgg/&Host=www.cwl.gov.cn'
+class HtmlDownloader:
 
     def __init__(self):
         """
             Constructor of HtmlDownloader.
         """
-        self.headers = {"Accept": "application/json, text/javascript, */*; q=0.01",
-                        "Host": "www.cwl.gov.cn",
-                        "Referer": "http://www.cwl.gov.cn/kjxx/ssq/kjgg/",
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"}
-        self.session = requests.Session()
-        self.domain = None
-        self.session.headers = self.headers
+        self.options = Options()
+        self.options.add_argument('-headless')
+        self.browser = Firefox(options=self.options)
+        self.wait = WebDriverWait(self.browser, 10)
 
-    def get_cookie(self):
-        """
-            Accessing base url to get the cookie object
-        :return: None
-        """
-        res = self.session.get(self.auth)
-        for co in res.cookies:
-            if not self.domain:
-                self.domain = co.domain
+    def __del__(self):
+        self.browser.quit()
 
-    def get_content(self, url):
-        if not self.session.cookies.get(self.key):
-            temp_cookie = requests.cookies.create_cookie(self.key, '1')
-            temp_cookie.domain = self.domain
-            self.session.cookies.set_cookie(temp_cookie)
-        else:
-            self.session.cookies.set(self.key, str(int(self.session.cookies.get(self.key)) + 1))
-
-        res = self.session.get(url)
-        res.encoding = 'utf-8'
-        return res.text
+    def get_page(self, url, table_class, max_condition=None):
+        self.browser.get(url)
+        if max_condition:
+            self.wait.until(expected.element_to_be_clickable((By.XPATH, max_condition))).click()
+        return self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME, table_class)))
 
 
 if __name__ == "__main__":
     downloader = HtmlDownloader()
-    downloader.get_cookie()
-    downloader.get_content(r"http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&issueCount=1")
+    downloader.get_page(r"http://www.cwl.gov.cn/kjxx/ssq/kjgg/")

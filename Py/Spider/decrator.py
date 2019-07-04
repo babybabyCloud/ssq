@@ -6,12 +6,13 @@ import logging
 
 logger = logging.getLogger('log_default')
 
+
 def error_handler(func):
     @functools.wraps(func)
-    def handle(*args):
+    def handle(*args, **kwargs):
         result = None
         try:
-            result = func(*args)
+            result = func(*args, **kwargs)
         except sqlite3.IntegrityError as e:
             logger.info('In {},'.format(func.__name__) + str(args) + ' has been in database')
         return result
