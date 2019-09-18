@@ -4,7 +4,7 @@ import sqlite3
 import logging
 
 
-logger = logging.getLogger('log_default')
+logger = logging.getLogger('default')
 
 
 def error_handler(func):
