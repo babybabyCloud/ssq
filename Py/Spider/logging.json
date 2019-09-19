@@ -1,0 +1,32 @@
+{
+    "version":1,
+    "formatters":{
+		"default":{
+			"fmt":"%(asctime)s-%(levelname)s %(filename)s:%(lineno)s - %(message)s"
+		}
+    },
+    "handlers":{
+        "console":{
+            "class":"logging.StreamHandler",
+            "formatter":"default",
+            "level":"INFO",
+            "stream":"ext://sys.stdout"
+        },
+        "file":{
+            "class":"logging.FileHandler",
+            "formatter":"default",
+            "level":"INFO",
+            "filename":"log",
+			"encoding": "utf-8"
+        }
+    },
+    "loggers":{
+        "default":{
+            "handlers":[
+                "console",
+                "file"
+            ],
+            "level": "INFO"
+        }
+    }
+}

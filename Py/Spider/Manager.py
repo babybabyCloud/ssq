@@ -39,6 +39,7 @@ class Manager:
                 detail_table = self.downloader.get_page(page[1], 'zjqk')
             except Exception as e:
                 logger.error("Error page %s" % page[1])
+                continue
             for i in self.page_parser.get_row_data(detail_table,
                                                    PageParser.get_detail_data_from_column, 'table/tbody/tr'):
                 tp = None
