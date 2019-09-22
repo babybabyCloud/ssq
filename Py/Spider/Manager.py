@@ -18,11 +18,9 @@ logger = logging.getLogger('default')
 
 class Manager:
 
-    def __init__(self):
-        self.conf = configparser.ConfigParser()
-        self.conf.read(str(ConfigFileSearchHelper.get_file_name(__file__, 'config.ini')), encoding='utf-8')
+    def __init__(self, db_file):
         self.downloader = HtmlDownloader()
-        self.db = DbHandler(self.conf)
+        self.db = DbHandler(db_file)
         self.page_parser = PageParser()
 
     def start(self, url):
@@ -51,8 +49,8 @@ class Manager:
                     self.db.insert_details(page[0], tp, i[1], i[2])
 
 
-def main():
-    manager = Manager()
+def main(**kwargs):
+    manager = Manager(**kwargs)
     url = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
     logger.info(url)
     manager.start(url)

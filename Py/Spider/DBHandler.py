@@ -4,11 +4,12 @@ import sqlite3
 
 
 class DbHandler:
-	def __init__(self, conf):
-		self.conn = sqlite3.connect(conf['db']['location'])
+	def __init__(self, db):
+		self.conn = sqlite3.connect(db)
 
 	def __del__(self):
-		self.conn.close()
+		if self.conn:
+			self.conn.close()
 
 	@error_handler
 	def insert_base(self, identify, reds, blue, date):
@@ -35,3 +36,9 @@ class DbHandler:
 		cur.execute('''INSERT INTO record_details(ID, TYPE, TYPE_NUM, TYPE_MONEY) VALUES(
 			?, ?, ?, ?);''', (identify, tp, type_num, money))
 		self.conn.commit()
+
+	def init_db(self):
+		cur = self.conn.cursor()
+		cur.execute('''SELECT * FROM SQLITE_MASTER WHERE tbl_name = ?;''', ('record_base',))
+		if not cur.fetchone():
+			pass
