@@ -1,10 +1,9 @@
-# coding:utf-8
+#! coding:utf-8
 
-from Spider.HtmlDownloader import HtmlDownloader, ConfigFileSearchHelper
-from Spider.DBHandler import DbHandler
-from Spider.PageParser import PageParser
-from Spider.AwardLevel import AwardLevel
-import configparser
+from Spider.downloader.HtmlDownloader import HtmlDownloader, ConfigFileSearchHelper
+from Spider.downloader.DBHandler import DbHandler
+from Spider.downloader.PageParser import PageParser
+from Spider.downloader.AwardLevel import AwardLevel
 import logging
 from logging.config import dictConfig
 import json
@@ -24,6 +23,7 @@ class Manager:
         self.page_parser = PageParser()
 
     def start(self, url):
+        self.db.init_db()
         details_page = []
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=100]')
         row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')

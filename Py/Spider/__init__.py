@@ -1,3 +1,7 @@
-# -*- encoding:utf-8 -*-
+# encoding: utf-8
 
-#__all__ = ["DBHandler", "decrator", "HtmlDow
+from enum import Enum
+
+class SubCommandType(Enum):
+    DOWNLOAD = 'download'
+    EXPORT = 'export'
