@@ -9,24 +9,25 @@ from Spider.downloader import Manager, QueryCountEnum
 class SubCommand(ABC):
     def __init__(self):
         self._parser = ArgumentParser()
+        self._parser.add_argument('--db-file', help='sqlite db file position must be provided', dest='db_file', required=True)
 
     @abstractmethod
     def execute(self, args):
         pass
 
-    def validate(self, args):
+    def extract(self, args):
         return self._parser.parse_args(args)
 
 class DownloadSubCommand(SubCommand):
     def __init__(self):
         super().__init__()
         self._parser.add_argument('--query-count', 
-            choices=QueryCountEnum.__members__.values, 
+            choices=[v.value for v in list(QueryCountEnum)], 
             default=QueryCountEnum.HIGHT.value, 
             dest='query_count')
 
     def execute(self, args):
-        Manager.main(self.validate(args))
+        Manager.main(self.extract(args))
 
 
 class ExportSubCommand(SubCommand):
