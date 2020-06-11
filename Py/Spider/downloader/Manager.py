@@ -1,6 +1,7 @@
 #! coding:utf-8
 
-from Spider.downloader.HtmlDownloader import HtmlDownloader, ConfigFileSearchHelper
+from Spider.downloader import get_file_name
+from Spider.downloader.HtmlDownloader import HtmlDownloader
 from Spider.dboperator.DBHandler import DbHandler
 from Spider.downloader.PageParser import PageParser
 from Spider.downloader.AwardLevel import AwardLevel
@@ -8,7 +9,7 @@ import logging
 from logging.config import dictConfig
 import json
 
-with open(str(ConfigFileSearchHelper.get_file_name(__file__, 'logging.json'))) as f:
+with open(str(get_file_name(__file__, 'logging.json'))) as f:
     config = json.load(f)
     dictConfig(config)
 
