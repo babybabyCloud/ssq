@@ -1,7 +1,7 @@
 #! coding:utf-8
 
 from Spider.downloader.HtmlDownloader import HtmlDownloader, ConfigFileSearchHelper
-from Spider.downloader.DBHandler import DbHandler
+from Spider.dboperator.DBHandler import DbHandler
 from Spider.downloader.PageParser import PageParser
 from Spider.downloader.AwardLevel import AwardLevel
 import logging
