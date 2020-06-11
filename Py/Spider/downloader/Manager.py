@@ -13,6 +13,7 @@ with open(str(ConfigFileSearchHelper.get_file_name(__file__, 'logging.json'))) a
     dictConfig(config)
 
 logger = logging.getLogger('default')
+START_PAGE = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
 
 
 class Manager:
@@ -40,7 +41,7 @@ class Manager:
                 logger.error("Error page %s" % page[1])
                 continue
             for i in self.page_parser.get_row_data(detail_table,
-                                                   PageParser.get_detail_data_from_column, 'table/tbody/tr'):
+                    PageParser.get_detail_data_from_column, 'table/tbody/tr'):
                 tp = None
                 for name, member in AwardLevel.__members__.items():
                     if name == i[0]:
@@ -48,11 +49,12 @@ class Manager:
                         break
                 if tp:
                     self.db.insert_details(page[0], tp, i[1], i[2])
+        logger.info('Pulling completed!')
 
 
 def main(**kwargs):
     manager = Manager(**kwargs)
-    url = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
+    url = START_PAGE
     logger.info(url)
     manager.start(url)
 

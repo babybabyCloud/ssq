@@ -27,7 +27,7 @@ class DownloadSubCommand(SubCommand):
             dest='query_count')
 
     def execute(self, args):
-        Manager.main(self.extract(args))
+        Manager.main(**vars(self.extract(args)))
 
 
 class ExportSubCommand(SubCommand):

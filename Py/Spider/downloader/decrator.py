@@ -14,6 +14,6 @@ def error_handler(func):
         try:
             result = func(*args, **kwargs)
         except sqlite3.IntegrityError as e:
-            logger.info('In {},'.format(func.__name__) + str(args) + ' has been in database')
+            logger.debug('In {},'.format(func.__name__) + str(args) + ' has been in database')
         return result
     return handle
