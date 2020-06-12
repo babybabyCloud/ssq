@@ -1,13 +1,20 @@
 # encoding: utf-8
 
-import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from threading import Lock
+
+Base = declarative_base()
+__Session = None
+__lock = Lock()
 
 
-class Base:
-    def __init__(self, db):
-        self.conn = sqlite3.connect(db)
-
-    def __del__(self):
-        if self.conn:
-            self.conn.close()
-
+def new_session(url):
+    global __Session
+    with __lock:
+        if __Session is None:
+            engine = create_engine(url, echo=False)
+            __Session = sessionmaker(engine)
+            Base.metadata.create_all(engine)
+        return __Session()
