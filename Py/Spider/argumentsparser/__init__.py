@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from argparse import Action, ArgumentParser
 from datetime import date
 from Spider import SubCommandType
+from Spider.exporter import Export
 from Spider.downloader import Manager, QueryCountEnum
 
 
@@ -44,12 +45,15 @@ class ExportSubCommand(SubCommand):
         self._parser.add_argument('--limit',
             help='The max counts for exporting', 
             type=int)
-        self._parser.add_argument('tables', 
-            help='The names of tables for exporting',
-            nargs='+')
+        self._parser.add_argument('--out', 
+            help='The output file.', 
+            nargs='?',
+            default='.')
+        self._parser.add_argument('table', 
+            help='The names of tables for exporting')
 
     def execute(self, args):
-        print(self.extract(args))
+        Export.main(**vars(self.extract(args)))
 
 
 class SubCommandAction(Action):

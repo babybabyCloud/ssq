@@ -28,7 +28,8 @@ class ExportTest(unittest.TestCase):
         self.assertEqual(before, str(result.before))
         self.assertEqual(after, str(result.after))
         self.assertEqual(limit, result.limit)
-        self.assertEqual([table], result.tables)
+        self.assertEqual(table, result.table)
+        self.assertEqual('.', result.out)
 
 
 if __name__ == '__main__':
