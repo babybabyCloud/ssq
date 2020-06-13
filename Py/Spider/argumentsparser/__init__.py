@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from argparse import Action, ArgumentParser
+from datetime import date
 from Spider import SubCommandType
 from Spider.downloader import Manager, QueryCountEnum
 
@@ -18,6 +19,7 @@ class SubCommand(ABC):
     def extract(self, args):
         return self._parser.parse_args(args)
 
+
 class DownloadSubCommand(SubCommand):
     def __init__(self):
         super().__init__()
@@ -31,8 +33,23 @@ class DownloadSubCommand(SubCommand):
 
 
 class ExportSubCommand(SubCommand):
+    def __init__(self):
+        super().__init__()
+        self._parser.add_argument('--before', 
+            help='The date before for export: YYYY-MM-DD',
+            type=date.fromisoformat)
+        self._parser.add_argument('--after', 
+            help='The date afater for export: YYYY-MM-DD',
+            type=date.fromisoformat)
+        self._parser.add_argument('--limit',
+            help='The max counts for exporting', 
+            type=int)
+        self._parser.add_argument('tables', 
+            help='The names of tables for exporting',
+            nargs='+')
+
     def execute(self, args):
-        print('export')
+        print(self.extract(args))
 
 
 class SubCommandAction(Action):

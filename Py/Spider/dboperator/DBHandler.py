@@ -4,10 +4,9 @@ import sqlite3
 import Spider
 import os.path
 from Spider.downloader.decrator import error_handler
-from Spider.dboperator import Base
 
 
-class DbHandler(Base):
+class DbHandler():
     @error_handler
     def insert_base(self, identify, reds, blue, date):
         cur = self.conn.cursor()
