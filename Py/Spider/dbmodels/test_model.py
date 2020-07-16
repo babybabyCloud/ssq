@@ -27,6 +27,6 @@ class RecordBaseTest(unittest.TestCase):
         self.session.commit()
 
         for record in self.session.query(model.RecordBase):
-            self.assertEquals(rb.red1, record.red1)
+            self.assertEqual(rb.red1, record.red1)
 
 

@@ -2,11 +2,13 @@
 
 from abc import ABC, abstractmethod
 from argparse import Action, ArgumentParser
-from datetime import date
+from datetime import datetime
 from Spider import SubCommandType
 from Spider.exporter import Export
 from Spider.downloader import Manager, QueryCountEnum
 
+
+_DATE_FORMAT = '%Y-%m-%d'
 
 class SubCommand(ABC):
     def __init__(self):
@@ -38,10 +40,10 @@ class ExportSubCommand(SubCommand):
         super().__init__()
         self._parser.add_argument('--before', 
             help='The date before for export: YYYY-MM-DD',
-            type=date.fromisoformat)
+            type=strptime)
         self._parser.add_argument('--after', 
             help='The date afater for export: YYYY-MM-DD',
-            type=date.fromisoformat)
+            type=strptime)
         self._parser.add_argument('--limit',
             help='The max counts for exporting', 
             type=int)
@@ -64,3 +66,6 @@ class SubCommandAction(Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, self.__sub_command_mapping[values])
+
+def strptime(date_string, format=_DATE_FORMAT):
+    return datetime.strptime(date_string, format).date()
