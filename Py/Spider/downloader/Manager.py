@@ -5,6 +5,7 @@ from Spider.downloader.HtmlDownloader import HtmlDownloader
 from Spider.dboperator.DBHandler import DbHandler
 from Spider.downloader.PageParser import PageParser
 from Spider.downloader.AwardLevel import AwardLevel
+from Spider.dboperator import new_session
 import logging
 from logging.config import dictConfig
 import json
@@ -21,12 +22,12 @@ class Manager:
 
     def __init__(self, db_file, query_count):
         self.downloader = HtmlDownloader()
-        self.db = DbHandler(db_file)
+        self.db = DbHandler()
         self.page_parser = PageParser()
         self._query_count = query_count
+        self.session = new_session('sqlite:///%s' % db_file)
 
     def start(self, url):
-        self.db.init_db()
         details_page = []
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
         row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')

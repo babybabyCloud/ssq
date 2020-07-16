@@ -1,19 +1,17 @@
 # coding:utf-8
 
-import sqlite3
 import Spider
 import os.path
 from Spider.downloader.decrator import error_handler
+from Spider.dbmodels import *
 
 
-class DbHandler():
+class DbHandler:
     @error_handler
-    def insert_base(self, identify, reds, blue, date):
-        cur = self.conn.cursor()
-        cur.execute('''INSERT INTO record_base(ID, RED_1, RED_2, RED_3, RED_4, RED_5, RED_6, BLUE, "DATE") VALUES(
-            ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (identify, *reds, *blue, date)
-        )
-        self.conn.commit()
+    def insert_base(self, identify, reds, blue, date, session):
+        record = RecordBase(id=identify, red1=reds[0], red2=reds[1], red3=reds[2], red4=reds[3], red5=reds[4], red6=reds[5],
+            blue=blue, date_=date)
+        session.add(record)
 
     @error_handler
     def insert_detail(self, identify, week, sales, money, link):

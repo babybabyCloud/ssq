@@ -2,7 +2,7 @@
 
 import os.path
 from Spider.dboperator import new_session
-from Spider .dboperator.model import *
+from Spider.dbmodels import *
 from . import exporterfactory
 
 
