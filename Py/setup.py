@@ -12,7 +12,7 @@ setup(
     },
 	entry_points={
 		'console_scripts': [
-			'Spider = Spider.main:main'
+			'ssq = Spider.main:main'
 		]
 	},
     author='babybabyCloud',

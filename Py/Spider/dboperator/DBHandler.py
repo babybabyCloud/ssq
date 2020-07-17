@@ -14,30 +14,21 @@ class DbHandler:
         session.add(record)
 
     @error_handler
-    def insert_detail(self, identify, week, sales, money, link):
-        cur = self.conn.cursor()
-        cur.execute('''INSERT INTO record_detail(ID, WEEK, SALES, POOL_MONEY, DETAIL_LINK) VALUES(
-            ?, ?, ?, ?, ?);''', (identify, week, sales, money, link))
-        self.conn.commit()
+    def insert_detail(self, identify, week, sales, money, link, session):
+        record = RecordDetail(id=identify, week=week, sales=sales, pool_money=money, detail_link=link)
+        session.add(record)
 
     @error_handler
-    def insert_details(self, identify, tp, type_num, money):
-        cur = self.conn.cursor()
-        cur.execute('''SELECT * FROM record_details WHERE ID = ? AND TYPE = ? AND TYPE_NUM = ? AND 
-            TYPE_MONEY = ?''', (identify, tp, type_num, money))
-        if cur.fetchone():
+    def insert_details(self, identify, tp, type_num, money, session):
+        if session.query(RecordDetails) \
+                .filter(RecordDetails.id == identify) \
+                .filter(RecordDetails.type == tp) \
+                .filter(RecordDetails.type_num == type_num) \
+                .filter(RecordDetails.type_money == money) \
+                .count() > 0:
             return
-        cur.execute('''INSERT INTO record_details(ID, TYPE, TYPE_NUM, TYPE_MONEY) VALUES(
-            ?, ?, ?, ?);''', (identify, tp, type_num, money))
-        self.conn.commit()
-
-    def init_db(self):
-        cur = self.conn.cursor()
-        cur.execute('''SELECT * FROM SQLITE_MASTER WHERE tbl_name = ?;''', ('record_base',))
-        if not cur.fetchone():
-            for sql_file in pop_file_with_pattern(os.path.join(Spider.__path__[0], 'SQLite/SQL'), '*.sql')():
-                with open(sql_file) as sql_f:
-                    cur.executescript(sql_f.read())
+        record = RecordDetails(id=identify, type=tp, type_num=type_num, type_money=money)
+        session.add(record)
 
 
 def pop_file_with_pattern(path, pattern):

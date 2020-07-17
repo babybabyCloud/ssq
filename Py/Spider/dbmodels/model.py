@@ -48,8 +48,8 @@ class RecordDetail(Base, TableFuncMixIn):
 class RecordDetails(Base, TableFuncMixIn):
     __tablename__ = 'record_details'
 
-    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True)
-    type = Column(Integer)
+    id = Column(Integer, ForeignKey('record_detail.id'), primary_key=True)
+    type = Column(Integer, primary_key=True)
     type_num = Column(Integer)
     type_money = Column(Integer)
 
