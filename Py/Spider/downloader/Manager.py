@@ -33,7 +33,7 @@ class Manager:
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
         row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')
         for row in row_gen:
-            self.db.insert_base(row.id, row.reds, row.blue, datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session)
+            self.db.insert_base(row.id, row.reds, row.blue[0], datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session)
             self.db.insert_detail(row.id, row.date[-2:-1], row.total, row.pool, row.detail_link, self.session)
             details_page.append((row.id, row.detail_link))
 

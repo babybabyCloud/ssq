@@ -2,6 +2,7 @@
 
 from collections.abc import Iterable
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
+from selenium.webdriver.common.by import By
 import logging
 
 
@@ -10,9 +11,9 @@ class PageParser:
         self.logger = logging.getLogger('default')
 
     def get_row_data(self, table_box: FirefoxWebElement, func, tbody):
-        rows = table_box.find_elements_by_xpath(tbody)
+        rows = table_box.find_elements(By.XPATH, tbody)
         for row in rows:
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements(By.TAG_NAME, 'td')
             yield func(columns)
 
     @staticmethod
@@ -25,11 +26,11 @@ class PageParser:
         data_next_attr = data.next_attr()
         del columns[5:11]
         for column in columns:
-            span = column.find_elements_by_tag_name('span')
+            span = column.find_elements(By.XPATH, 'span')
             if len(span) > 0 and isinstance(span, Iterable):
                 setattr(data, next(data_next_attr), [x.text for x in span])
             elif column is columns[-1]:
-                setattr(data, next(data_next_attr), column.find_element_by_tag_name('a').get_attribute('href'))
+                setattr(data, next(data_next_attr), column.find_element(By.TAG_NAME, 'a').get_attribute('href'))
             else:
                 setattr(data, next(data_next_attr), column.text)
         return data

@@ -7,18 +7,17 @@ from Spider.dbmodels import *
 
 
 class DbHandler:
-    @error_handler
     def insert_base(self, identify, reds, blue, date, session):
-        record = RecordBase(id=identify, red1=reds[0], red2=reds[1], red3=reds[2], red4=reds[3], red5=reds[4], red6=reds[5],
-            blue=blue, date_=date)
-        session.add(record)
+        if session.query(RecordBase).filter(RecordBase.id == identify).count() <= 0 :
+            record = RecordBase(id=identify, red1=reds[0], red2=reds[1], red3=reds[2], red4=reds[3], red5=reds[4], red6=reds[5],
+                blue=blue, date_=date)
+            session.add(record)
 
-    @error_handler
     def insert_detail(self, identify, week, sales, money, link, session):
-        record = RecordDetail(id=identify, week=week, sales=sales, pool_money=money, detail_link=link)
-        session.add(record)
+        if session.query(RecordDetail).filter(RecordDetail.id == identify).count() <= 0 :
+            record = RecordDetail(id=identify, week=week, sales=sales, pool_money=money, detail_link=link)
+            session.add(record)
 
-    @error_handler
     def insert_details(self, identify, tp, type_num, money, session):
         if session.query(RecordDetails) \
                 .filter(RecordDetails.id == identify) \

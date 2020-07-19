@@ -5,3 +5,4 @@
 **/lib
 *egg*
 pyvenv.cfg
+.vscode/
