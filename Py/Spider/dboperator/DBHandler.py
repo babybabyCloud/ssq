@@ -1,8 +1,5 @@
 # coding:utf-8
 
-import Spider
-import os.path
-from Spider.downloader.decrator import error_handler
 from Spider.dbmodels import *
 
 
