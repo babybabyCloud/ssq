@@ -1,15 +1,20 @@
 #! -*- encoding;utf-8 -*-
 
-import sys
 import argparse
-import Spider.Manager
+import sys
+import Spider
+import Spider.downloader.Manager
+import Spider.argumentsparser
 
 
 def main():
-	parser = argparse.ArgumentParser()
-	parser.add_argument('--db-file', help='You must provide the sqlite file position', dest='db_file', required=True)
-	Spider.Manager.main(**vars(parser.parse_args(sys.argv[1:])))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('sub_command', action=Spider.argumentsparser.SubCommandAction, 
+        choices=[item.value for item in list(Spider.SubCommandType)])
+    parser.add_argument('sub_args', nargs=argparse.REMAINDER)
+    args = parser.parse_args(sys.argv[1:])
+    args.sub_command.execute(args.sub_args)
 
 
 if __name__ == '__main__':
-	sys.exit(main())
+    sys.exit(main())

@@ -4,15 +4,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='ssq',
-    version='0.1',
+    version='0.2',
 	packages=find_packages(),
-    install_requires=['selenium>=3.141.0'],
+    install_requires=['selenium>=3.141.0', 'SQLAlchemy'],
     package_data={
-        'Spider': ['*.json', 'geckodriver', 'SQLite/SQL/*.sql']
+        'Spider': ['downloader/*.json', 'downloader/geckodriver', 'SQLite/SQL/*.sql']
     },
 	entry_points={
 		'console_scripts': [
-			'Spider = Spider.main:main'
+			'ssq = Spider.main:main'
 		]
 	},
     author='babybabyCloud',
