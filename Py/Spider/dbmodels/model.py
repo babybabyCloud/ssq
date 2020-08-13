@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from Spider.dboperator import Base
+from ..dboperator import Base
 from sqlalchemy import Column, Integer, Date, String, ForeignKey
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 

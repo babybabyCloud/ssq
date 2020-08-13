@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import unittest
-from Spider.argumentsparser import DownloadSubCommand, ExportSubCommand
+from ..argumentsparser import DownloadSubCommand, ExportSubCommand
 
 
 class DownloadTest(unittest.TestCase):

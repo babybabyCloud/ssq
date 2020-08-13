@@ -1,6 +1,6 @@
 # coding:utf-8
 
-from Spider.dbmodels import *
+from ..dbmodels import *
 
 
 class DbHandler:

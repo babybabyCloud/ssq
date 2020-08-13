@@ -2,8 +2,8 @@
 
 import unittest
 from datetime import datetime
-from Spider.dboperator import new_session
-from Spider.dbmodels import model
+from ..dboperator import new_session
+from ..dbmodels import model
 
 class TestTableFuncMixIn(unittest.TestCase):
 

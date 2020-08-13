@@ -3,13 +3,9 @@
 from collections.abc import Iterable
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
-import logging
 
 
 class PageParser:
-    def __init__(self):
-        self.logger = logging.getLogger('default')
-
     def get_row_data(self, table_box: FirefoxWebElement, func, tbody):
         rows = table_box.find_elements(By.XPATH, tbody)
         for row in rows:

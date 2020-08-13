@@ -1,21 +1,13 @@
 #! coding:utf-8
 
-from Spider.downloader import get_file_name
-from Spider.downloader.HtmlDownloader import HtmlDownloader
-from Spider.dboperator.DBHandler import DbHandler
-from Spider.downloader.PageParser import PageParser
-from Spider.downloader.AwardLevel import AwardLevel
-from Spider.dboperator import new_session
-import logging
-from logging.config import dictConfig
-import json
+from .. import logger
+from ..downloader.HtmlDownloader import HtmlDownloader
+from ..dboperator.DBHandler import DbHandler
+from ..downloader.PageParser import PageParser
+from ..downloader import AwardLevel
+from ..dboperator import new_session
 from datetime import datetime
 
-with open(str(get_file_name(__file__, 'logging.json'))) as f:
-    config = json.load(f)
-    dictConfig(config)
-
-logger = logging.getLogger('default')
 START_PAGE = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
 
 
@@ -29,7 +21,6 @@ class Manager:
         self.session = new_session('sqlite:///%s' % db_file)
 
     def start(self, url):
-        self.db.init_db()
         details_page = []
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
         row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')
@@ -60,7 +51,7 @@ class Manager:
 def main(**kwargs):
     manager = Manager(**kwargs)
     url = START_PAGE
-    logger.info(url)
+    logger.info('Start pulling from %s' %url)
     manager.start(url)
 
 

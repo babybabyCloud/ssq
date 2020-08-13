@@ -1,14 +1,11 @@
 # coding:utf-8
 
-import logging
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expected
 from selenium.webdriver.support.wait import WebDriverWait
-from Spider.downloader import get_file_name
-
-logger = logging.getLogger('default')
+from .. import get_file_name
 
 
 class HtmlDownloader:

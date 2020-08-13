@@ -15,7 +15,7 @@
         "file":{
             "class":"logging.FileHandler",
             "formatter":"default",
-            "level":"INFO",
+            "level":"DEBUG",
             "filename":"log",
 			"encoding": "utf-8"
         }

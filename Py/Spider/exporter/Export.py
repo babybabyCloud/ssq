@@ -1,8 +1,8 @@
 # encoding: utf-8
 
 import os.path
-from Spider.dboperator import new_session
-from Spider.dbmodels import *
+from ..dboperator import new_session
+from ..dbmodels import *
 from . import exporterfactory
 
 

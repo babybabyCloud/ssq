@@ -1,8 +1,8 @@
 # encoding: utf-8
 
 import unittest
-from ..dboperator.DBHandler import DbHandler
-import Spider.dboperator as dbop
+from .DBHandler import DbHandler
+from . import new_session
 import datetime
 from ..dbmodels import *
 
@@ -10,7 +10,7 @@ class DBHandlerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.session = dbop.new_session('sqlite:///:memory:')
+        cls.session = new_session('sqlite:///:memory:')
         cls.dbh = DbHandler()
 
     def test_insert_base(self):

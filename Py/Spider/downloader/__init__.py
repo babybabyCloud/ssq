@@ -7,8 +7,11 @@ class QueryCountEnum(Enum):
     MEDIUM = '50'
     HIGHT = '100'
 
-def get_file_name(file_path, target_name):
-        import os.path
-        from pathlib import PurePath
-        directory = os.path.dirname(os.path.abspath(file_path))
-        return PurePath(directory, target_name)
+
+class AwardLevel(Enum):
+    一等奖 = 1
+    二等奖 = 2
+    三等奖 = 3
+    四等奖 = 4
+    五等奖 = 5
+    六等奖 = 6

@@ -3,9 +3,9 @@
 from abc import ABC, abstractmethod
 from argparse import Action, ArgumentParser
 from datetime import datetime
-from Spider import SubCommandType
-from Spider.exporter import Export
-from Spider.downloader import Manager, QueryCountEnum
+from .. import SubCommandType
+from ..exporter import Export
+from ..downloader import Manager, QueryCountEnum
 
 
 _DATE_FORMAT = '%Y-%m-%d'
