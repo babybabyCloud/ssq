@@ -8,7 +8,7 @@ setup(
 	packages=find_packages(),
     install_requires=['selenium>=3.141.0', 'SQLAlchemy'],
     package_data={
-        'Spider': ['downloader/*.json', 'downloader/geckodriver', 'SQLite/SQL/*.sql']
+        'Spider': ['logging.json', 'downloader/geckodriver', 'SQLite/SQL/*.sql']
     },
 	entry_points={
 		'console_scripts': [
