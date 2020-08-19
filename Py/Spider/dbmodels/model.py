@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from ..dboperator import Base
-from sqlalchemy import Column, Integer, Date, String, ForeignKey
+from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
@@ -55,6 +55,24 @@ class RecordDetails(Base, TableFuncMixIn):
 
     def __repr__(self):
         return "<record_details(id=%s, type=%s, type_num=%s, type_money=%s)>" % (self.id, self.type, self.type_num, self.type_money)
+
+
+class RecordsMean(Base, TableFuncMixIn):
+    __tablename__ = 'records_mean'
+
+    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True)
+    mean1 = Column('mean_1', Float)
+    mean2 = Column('mean_2', Float)
+    mean3 = Column('mean_3', Float)
+    mean4 = Column('mean_4', Float)
+    mean5 = Column('mean_5', Float)
+    mean6 = Column('mean_6', Float)
+    mean_blue = Column(Float)
+    type = Column(Integer, nullable=False)
+
+    def __repr__(self):
+        return "<records_mean(id=%s, means=[%s, %s, %s, %s, %s, %s], mean_blue=%s, type=%s)>" % (self.id, self.mean1, 
+                self.mean2, self.mean3, self.mean4, self.mean5, self.mean6, self.meanblue, self.type)
 
 tablemapping = {RecordBase.__tablename__: RecordBase, 
         RecordDetail.__tablename__: RecordDetail,
