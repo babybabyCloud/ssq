@@ -7,8 +7,6 @@ from ..downloader.PageParser import PageParser
 from ..downloader import AwardLevel
 from ..dboperator import new_session
 from datetime import datetime
-from concurrent.futures import TheadPoolExecutor
-
 
 START_PAGE = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
 
@@ -21,28 +19,21 @@ class Manager:
         self.page_parser = PageParser()
         self._query_count = query_count
         self.session = new_session('sqlite:///%s' % db_file)
-        self._pool = ThreadPoolExecutor(thead_naem_prefix='insert_table_')
 
     def start(self, url):
+        details_page = []
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
-        rows = [self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')]
-        self._pool.map(db.insert_base, 
-            (row.id, row.reds, row.blue[0], datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session \
-                for row in rows
-            )
-        )
-        self._pool.map(db.insert_detail, 
-            (row.id, row.date[-2:-1], row.total, row.pool, row.detail_link, self.session, for row in rows)
-        )
-            #self.db.insert_base(row.id, row.reds, row.blue[0], datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session)
-            #self.db.insert_detail(row.id, row.date[-2:-1], row.total, row.pool, row.detail_link, self.session)
-            #details_page.append((row.id, row.detail_link))
+        row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')
+        for row in row_gen:
+            self.db.insert_base(row.id, row.reds, row.blue[0], datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session)
+            self.db.insert_detail(row.id, row.date[-2:-1], row.total, row.pool, row.detail_link, self.session)
+            details_page.append((row.id, row.detail_link))
 
-        for page in rows
+        for page in details_page:
             try:
-                detail_table = self.downloader.get_page(page.detail_link[1], 'zjqk')
+                detail_table = self.downloader.get_page(page[1], 'zjqk')
             except Exception as e:
-                logger.error("Error page %s" % page.detail_link[1])
+                logger.error("Error page %s" % page[1])
                 continue
             for i in self.page_parser.get_row_data(detail_table,
                     PageParser.get_detail_data_from_column, 'table/tbody/tr'):
