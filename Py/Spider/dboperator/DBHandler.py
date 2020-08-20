@@ -1,31 +1,30 @@
 # coding:utf-8
 
 from ..dbmodels import *
+from sqlalchemy.orm.session import Sesseion
 
 
 class DbHandler:
-    def insert_base(self, identify, reds, blue, date, session):
-        if session.query(RecordBase).filter(RecordBase.id == identify).count() <= 0 :
-            record = RecordBase(id=identify, red1=reds[0], red2=reds[1], red3=reds[2], red4=reds[3], red5=reds[4], red6=reds[5],
-                blue=blue, date_=date)
-            session.add(record)
+    def insert_base(self, record_base: RecordBase, session):
+        if session.query(RecordBase).filter(RecordBase.id == record_base.id).count() <= 0 :
+            session.add(record_base)
 
-    def insert_detail(self, identify, week, sales, money, link, session):
-        if session.query(RecordDetail).filter(RecordDetail.id == identify).count() <= 0 :
-            record = RecordDetail(id=identify, week=week, sales=sales, pool_money=money, detail_link=link)
-            session.add(record)
+    def insert_detail(self, record_detail: RecordDetail, session):
+        if session.query(RecordDetail).filter(RecordDetail.id == record_detail.id).count() <= 0 :
+            session.add(record_detail)
 
-    def insert_details(self, identify, tp, type_num, money, session):
+    def insert_details(self, record_details: RecordDetails, session):
         if session.query(RecordDetails) \
-                .filter(RecordDetails.id == identify) \
-                .filter(RecordDetails.type == tp) \
-                .filter(RecordDetails.type_num == type_num) \
-                .filter(RecordDetails.type_money == money) \
+                .filter(RecordDetails.id == record_details.id) \
+                .filter(RecordDetails.type == record_details.type) \
+                .filter(RecordDetails.type_num == record_details.type_num) \
+                .filter(RecordDetails.type_money == record_details.type_money) \
                 .count() > 0:
             return
-        record = RecordDetails(id=identify, type=tp, type_num=type_num, type_money=money)
-        session.add(record)
+        session.add(record_details)
 
+    def select_base_all(self, session: Session):
+        return session.query(RecordBase).order_by(RecordBase.id).all()
 
 def pop_file_with_pattern(path, pattern):
     import os

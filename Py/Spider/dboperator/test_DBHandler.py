@@ -14,7 +14,8 @@ class DBHandlerTest(unittest.TestCase):
         cls.dbh = DbHandler()
 
     def test_insert_base(self):
-        self.dbh.insert_base(2, [1,2,3,4,5,6], 10, datetime.datetime.now(), self.session)
+        record_base = RecordBase(id=2, red1=1, red2=2, red3=3, red4=4, red5=5, red6=6, blue=7, date_=datetime.datetime.now())
+        self.dbh.insert_base(record_base, self.session)
         self.session.commit()
         record = self.session.query(RecordBase).first()
         self.assertEqual(1, record.id)

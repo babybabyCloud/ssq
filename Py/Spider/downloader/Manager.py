@@ -25,8 +25,12 @@ class Manager:
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
         row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')
         for row in row_gen:
-            self.db.insert_base(row.id, row.reds, row.blue[0], datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session)
-            self.db.insert_detail(row.id, row.date[-2:-1], row.total, row.pool, row.detail_link, self.session)
+            record_base = RecordBase(id=row.id, red1=row.reds[0], red2=row.reds[1], red3=row.reds[2], red4=row.reds[3], 
+                red5=row.reds[4], red6=row.reds[5], blue=row.blue, date_=datetime.strptime(row.date[:-3], '%Y-%m-%d'))
+            record_detail = RecordDetail(id=row.id, week=row.date[-2:-1], sales=row.tatal, pool_money=row.pool, 
+                detail_link=row.detail_link)
+            self.db.insert_base(record_base, self.session)
+            self.db.insert_detail(record_detail, self.session)
             details_page.append((row.id, row.detail_link))
 
         for page in details_page:
@@ -43,7 +47,8 @@ class Manager:
                         tp = member.value
                         break
                 if tp:
-                    self.db.insert_details(page[0], tp, i[1], i[2], self.session)
+                    record_details = RecordDetails(id=page[0], type=tp, type_num=i[1], type_money=i[2])
+                    self.db.insert_details(record_details, self.session)
         self.session.commit()
         logger.info('Pulling completed!')
 
