@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from ..dbmodels import *
-from sqlalchemy.orm.session import Sesseion
+from sqlalchemy.orm.session import Session
 
 
 class DbHandler:

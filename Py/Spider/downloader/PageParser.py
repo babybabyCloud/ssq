@@ -5,31 +5,30 @@ from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
 
 
-class PageParser:
-    def get_row_data(self, table_box: FirefoxWebElement, func, tbody):
-        rows = table_box.find_elements(By.XPATH, tbody)
-        for row in rows:
-            columns = row.find_elements(By.TAG_NAME, 'td')
-            yield func(columns)
+def get_row_data(table_box: FirefoxWebElement, func, tbody):
+    rows = table_box.find_elements(By.XPATH, tbody)
+    for row in rows:
+        columns = row.find_elements(By.TAG_NAME, 'td')
+        yield func(columns)
 
-    @staticmethod
-    def get_detail_data_from_column(columns):
-        return tuple([columns[index].text for index in range(len(columns))])
 
-    @staticmethod
-    def get_data_from_column(columns):
-        data = SSQData()
-        data_next_attr = data.next_attr()
-        del columns[5:11]
-        for column in columns:
-            span = column.find_elements(By.XPATH, 'span')
-            if len(span) > 0 and isinstance(span, Iterable):
-                setattr(data, next(data_next_attr), [x.text for x in span])
-            elif column is columns[-1]:
-                setattr(data, next(data_next_attr), column.find_element(By.TAG_NAME, 'a').get_attribute('href'))
-            else:
-                setattr(data, next(data_next_attr), column.text)
-        return data
+def get_detail_data_from_column(columns):
+    return tuple([columns[index].text for index in range(len(columns))])
+
+
+def get_data_from_column(columns):
+    data = SSQData()
+    data_next_attr = data.next_attr()
+    del columns[5:11]
+    for column in columns:
+        span = column.find_elements(By.XPATH, 'span')
+        if len(span) > 0 and isinstance(span, Iterable):
+            setattr(data, next(data_next_attr), [x.text for x in span])
+        elif column is columns[-1]:
+            setattr(data, next(data_next_attr), column.find_element(By.TAG_NAME, 'a').get_attribute('href'))
+        else:
+            setattr(data, next(data_next_attr), column.text)
+    return data
 
 
 class SSQData:
