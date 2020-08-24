@@ -2,6 +2,7 @@
 
 from ..dboperator import Base
 from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
@@ -24,6 +25,10 @@ class RecordBase(Base, TableFuncMixIn):
     red6 = Column('red_6', Integer, nullable=False)
     blue = Column(Integer, nullable=False)
     date_ = Column('date', Date, nullable=False)
+    record_detail = relationship('RecordDetail', uselist=False, back_populates='record_base')
+    records_mean = relationship('RecordsMean', uselist=False, back_populates='record_base')
+
+    # headers for exporting as CSV headers
     headers = ['ID', 'RED1', 'RED2', 'RED3', 'RED4', 'RED5', 'RED6', 'BLUE', 'DATE']
 
     def __repr__(self):
@@ -39,6 +44,8 @@ class RecordDetail(Base, TableFuncMixIn):
     sales = Column(Integer)
     pool_money = Column(Integer)
     detail_link = Column(String(255))
+    record_base = relationship('RecordBase', uselist=False, back_populates='record_detail')
+    record_details = relationship('RecordDetails', back_populates='record_detail')
 
     def __repr__(self):
         return "<record_detail(id=%s, week=%s, sales=%s, pool_money=%s, detail_link=%s)>" % (self.id, self.week, self.sales,
@@ -52,6 +59,7 @@ class RecordDetails(Base, TableFuncMixIn):
     type = Column(Integer, primary_key=True)
     type_num = Column(Integer)
     type_money = Column(Integer)
+    record_detail = relationship('RecordDetail', uselist=False, back_populates='record_details')
 
     def __repr__(self):
         return "<record_details(id=%s, type=%s, type_num=%s, type_money=%s)>" % (self.id, self.type, self.type_num, self.type_money)
@@ -69,6 +77,7 @@ class RecordsMean(Base, TableFuncMixIn):
     mean6 = Column('mean_6', Float)
     mean_blue = Column(Float)
     type = Column(Integer, nullable=False)
+    record_base = relationship('RecordBase', uselist=False, back_populates='records_mean')
 
     def __repr__(self):
         return "<records_mean(id=%s, means=[%s, %s, %s, %s, %s, %s], mean_blue=%s, type=%s)>" % (self.id, self.mean1, 

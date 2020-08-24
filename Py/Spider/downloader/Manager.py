@@ -2,7 +2,7 @@
 
 from .. import logger
 from ..downloader.HtmlDownloader import HtmlDownloader
-from ..dboperator.DBHandler import DbHandler
+from ..dboperator.DBHandler import *
 from ..downloader.PageParser import get_row_data, get_data_from_column, get_detail_data_from_column
 from ..downloader import AwardLevel
 from ..dboperator import new_session
@@ -16,7 +16,6 @@ class Manager:
 
     def __init__(self, db_file, query_count):
         self.downloader = HtmlDownloader()
-        self.db = DbHandler()
         self._query_count = query_count
         self.session = new_session('sqlite:///%s' % db_file)
 
@@ -30,8 +29,8 @@ class Manager:
                                      date_=datetime.strptime(row.date[:-3], '%Y-%m-%d')
                                      )
             record_detail = RecordDetail(id=row.id, week=row.date[-2:-1], sales=row.total, pool_money=row.pool)
-            self.db.insert_base(record_base, self.session)
-            self.db.insert_detail(record_detail, self.session)
+            insert_base(record_base, self.session)
+            insert_detail(record_detail, self.session)
             details_page.append((row.id, row.detail_link))
 
         for page in details_page:
@@ -49,7 +48,7 @@ class Manager:
                         break
                 if tp:
                     record_details = RecordDetails(id=page[0], type=tp, type_num=i[1], type_money=i[2])
-                    self.db.insert_details(record_details, self.session)
+                    insert_details(record_details, self.session)
         self.session.commit()
         logger.info('Pulling completed!')
 
