@@ -2,7 +2,7 @@
 
 from ..dboperator import *
 from ..dbmodels.model import RecordBase
-from pandas import read_sql_table
+import pandas as pd
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
 from typing import Iterable, Tuple

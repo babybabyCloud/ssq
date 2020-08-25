@@ -86,4 +86,4 @@ class RecordsMean(Base, TableFuncMixIn):
 tablemapping = {RecordBase.__tablename__: RecordBase, 
         RecordDetail.__tablename__: RecordDetail,
         RecordDetails.__tablename__: RecordDetails,
-        RecordsMean.__tablename__: RecordsdMean}
+        RecordsMean.__tablename__: RecordsMean}
