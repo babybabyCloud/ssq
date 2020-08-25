@@ -3,7 +3,9 @@
 from functools import wraps
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.session import Session
 from threading import Lock
 
 Base = declarative_base()
@@ -18,7 +20,11 @@ def new_session(url):
         if __engine is None:
             __engine = create_engine(url, echo=False)
             Base.metadata.create_all(__engine)
-    return sessionmaker(bind=__engine)()
+    return new_session_with_engine(__engine)
+
+
+def new_session_with_engine(engine: Engine) -> Session:
+    return sessionmaker(bind=engine)()
 
 
 def get_engine():

@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
-__all__ = ["tablemapping", "RecordBase", "RecordDetail", "RecordDetails"]
+__all__ = ['tablemapping', 'RecordBase', 'RecordDetail', 'RecordDetails', 'RecordsMean']
 
 class TableFuncMixIn:
     def columns(self):
@@ -26,7 +26,7 @@ class RecordBase(Base, TableFuncMixIn):
     blue = Column(Integer, nullable=False)
     date_ = Column('date', Date, nullable=False)
     record_detail = relationship('RecordDetail', uselist=False, back_populates='record_base')
-    records_mean = relationship('RecordsMean', uselist=False, back_populates='record_base')
+    records_mean = relationship('RecordsMean', back_populates='record_base')
 
     # headers for exporting as CSV headers
     headers = ['ID', 'RED1', 'RED2', 'RED3', 'RED4', 'RED5', 'RED6', 'BLUE', 'DATE']
@@ -76,7 +76,7 @@ class RecordsMean(Base, TableFuncMixIn):
     mean5 = Column('mean_5', Float)
     mean6 = Column('mean_6', Float)
     mean_blue = Column(Float)
-    type = Column(Integer, nullable=False)
+    type = Column(Integer, primary_key=True)
     record_base = relationship('RecordBase', uselist=False, back_populates='records_mean')
 
     def __repr__(self):
@@ -85,4 +85,5 @@ class RecordsMean(Base, TableFuncMixIn):
 
 tablemapping = {RecordBase.__tablename__: RecordBase, 
         RecordDetail.__tablename__: RecordDetail,
-        RecordDetails.__tablename__: RecordDetails}
+        RecordDetails.__tablename__: RecordDetails,
+        RecordsMean.__tablename__: RecordsdMean}

@@ -15,7 +15,7 @@ class TestTableFuncMixIn(unittest.TestCase):
 
     def test_columns(self):
         record_details = model.RecordDetails(id=1, type=2, type_num=3, type_money=10)
-        self.assertEqual((1,2,10, 3), record_details.columns())
+        self.assertEqual((1,None,2,10,3), record_details.columns())
 
 
 class RecordBaseTest(unittest.TestCase):
@@ -66,11 +66,14 @@ class RecordsMeanTest(unittest.TestCase):
         self.session = new_session(_MOMORY_SQL_URL)
 
     def test_records_mean(self):
-        rm = model.RecordsMean(id=2019014, mean1=1, mean2=2, mean3=3, mean4=4, mean5=5, mean6=6, mean_blue=8, type=30)
+        rb = model.RecordBase(red1=1, red2=3, red3=10, red4=15, red5=16, red6=22, blue=8, date_=datetime.now().date())
+        rm = model.RecordsMean(id=2019014, mean1=1, mean2=2, mean3=3, mean4=4, mean5=5, mean6=6, mean_blue=8, type=30, 
+                               record_base=rb)
         self.session.add(rm)
         self.session.commit()
 
         for record in self.session.query(model.RecordsMean):
             self.assertEqual(rm.type, record.type)
+            self.assertEqual(rb.red3, record.record_base.red3)
 
 
