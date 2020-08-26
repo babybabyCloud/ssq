@@ -67,5 +67,6 @@ class SubCommandAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, self.__sub_command_mapping[values])
 
+
 def strptime(date_string, format=_DATE_FORMAT):
     return datetime.strptime(date_string, format).date()

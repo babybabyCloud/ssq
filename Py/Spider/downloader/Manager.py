@@ -19,7 +19,7 @@ class Manager:
         self._query_count = query_count
         self.session = new_session('sqlite:///%s' % db_file)
 
-    def start(self, url):
+    def start(self, url: str):
         details_page = []
         table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
         row_gen = get_row_data(table_box, get_data_from_column, '//tbody/tr')
@@ -51,6 +51,16 @@ class Manager:
                     insert_details(record_details, self.session)
         self.session.commit()
         logger.info('Pulling completed!')
+        self.start_compute()
+
+
+    def start_compute(self):
+        logger.info('Start compute mean')
+
+        from ..analyse.compute import compute_means
+        from ..dboperator import get_engine
+
+        compute_means(get_engine(), int(self._query_count))
 
 
 def main(**kwargs):
