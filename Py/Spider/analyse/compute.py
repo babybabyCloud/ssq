@@ -17,6 +17,7 @@ def compute_means(engine: Engine, limit: int = __DEFAULT_LIMIT):
     needed_computed_ids = read_needed_compute_data(limit, session)
     logger.debug('The ids: %s will be computed, the mean for type %d' %(needed_computed_ids, limit))
     df = pd.read_sql_table(RecordBase.__table__.name, engine)
+    df = df.rename(str.upper, axis='columns')
     means = list()
     for item in needed_computed_ids:
         mean = df.loc[df['ID'] < item].reset_index().loc[:__DEFAULT_LIMIT-1, 'RED_1':'BLUE'].mean()
@@ -35,5 +36,6 @@ def read_needed_compute_data(limit: int, session: Session) -> Iterable[int]:
             .outerjoin(RecordsMean) \
             .filter(RecordsMean.id == None) \
             .filter(RecordBase.id >= rb[0]) \
-            .order_by(RecordBase.id)
+            .order_by(RecordBase.id) \
+            .all()
     return [inner for outer in ids for inner in outer]
