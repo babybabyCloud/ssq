@@ -81,7 +81,7 @@ class RecordsMean(Base, TableFuncMixIn):
 
     def __repr__(self):
         return "<records_mean(id=%s, means=[%s, %s, %s, %s, %s, %s], mean_blue=%s, type=%s)>" % (self.id, self.mean1, 
-                self.mean2, self.mean3, self.mean4, self.mean5, self.mean6, self.meanblue, self.type)
+                self.mean2, self.mean3, self.mean4, self.mean5, self.mean6, self.mean_blue, self.type)
 
 tablemapping = {RecordBase.__tablename__: RecordBase, 
         RecordDetail.__tablename__: RecordDetail,

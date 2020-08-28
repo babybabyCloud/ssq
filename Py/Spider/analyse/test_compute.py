@@ -29,10 +29,27 @@ class ComputeTest(unittest.TestCase):
     # unittest will run the test case by method name with ASCII order, this method need run after 
     # test_1_read_needed_compute_data, so add a '2' in the method name
     def test_2_compute_means(self):
+        csv_data = list()
+        with open(get_file_name(__file__, 'record_base.csv')) as f:
+            data = csv.reader(f)
+            # skip the header
+            next(data)
+            for item in data:
+                csv_data.append(item)
         engine = get_engine()
         compute_means(engine, self._default_limit)
-        for item in self.session.query(RecordsMean.mean1).all():
-            print(item)
+        # calculate the data from csv
+        for item in self.session.query(RecordsMean.id, RecordsMean.mean1).all():
+            sum = 0
+            hit = 0 
+            for csv_row in reversed(csv_data):
+                if int(csv_row[0]) == item[0] or sum != 0:
+                    sum += int(csv_row[1])
+                    hit += 1
+                if hit == self._default_limit:
+                    break
+            # Compare the mean calculated by above to read from table
+            self.assertEqual(sum / self._default_limit, item[1])
 
     def test_1_read_needed_compute_data(self):
         self.assertEqual([2018098, 2018099], read_needed_compute_data(self._default_limit, self.session))
