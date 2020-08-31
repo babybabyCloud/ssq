@@ -4,15 +4,15 @@ from ..dbmodels import *
 from sqlalchemy.orm.session import Session
 
 
-def insert_base(record_base: RecordBase, session):
+def insert_base(record_base: RecordBase, session: Session):
     if session.query(RecordBase).filter(RecordBase.id == record_base.id).count() <= 0 :
         session.add(record_base)
 
-def insert_detail(record_detail: RecordDetail, session):
+def insert_detail(record_detail: RecordDetail, session: Session):
     if session.query(RecordDetail).filter(RecordDetail.id == record_detail.id).count() <= 0 :
         session.add(record_detail)
 
-def insert_details(record_details: RecordDetails, session):
+def insert_details(record_details: RecordDetails, session: Session):
     if session.query(RecordDetails) \
             .filter(RecordDetails.id == record_details.id) \
             .filter(RecordDetails.type == record_details.type) \

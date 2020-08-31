@@ -30,31 +30,29 @@ class HtmlDownloader(BaseProcessor):
         logger.info('Close the browser')
         self.browser.quit()
 
-    def execute(self) -> WebElement:
-        logger.info('Execute in %s with data %s', self.__class__, self.context_data)
-        return self.get_page(**self.context_data)   
-
+    def execute(self) -> None:
+        logger.info('Execute in %s with data %s', self.__class__, self.context_data.request)
+        self.get_page(**self.context_data.request)
 
     def get_page(self, url: str, element_class: str, **kwargs) -> WebElement:
-        '''
-        :param url: Tha page URL need to download
-        :param element_class: The inner content of element_class need to return 
-        '''
         pass
 
 
 class BasePageDownloader(HtmlDownloader):
-    def get_page(self, url: str, element_class: str, max_condition: str) -> WebElement :
+    def get_page(self, url: str, element_class: str, max_condition: str, **kwargs) -> WebElement :
         '''
+        :param url: Tha page URL need to download
+        :param element_class: The inner content of element_class need to return 
         :param max_condition: Some element need click before return the data
         '''
         self.browser.get(url)
         self.wait.until(expected.element_to_be_clickable((By.XPATH, max_condition))).click()
-        return self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME, element_class)))
+        self.context_data.response = dict(page=self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME,
+                element_class))), tbody='//tbody/tr')
 
 
 class DetailsPageDownloader(HtmlDownloader):
-    def get_page(self, url: str, element_class: str) -> WebElement :
+    def get_page(self, url: str, element_class: str, **kwargs) -> WebElement :
         self.browser.get(url)
-        return self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME, element_class)))
-
+        self.context_data.response = dict(page=self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME, 
+                element_class))), tbody='table/tbody/tr')

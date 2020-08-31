@@ -1,9 +1,11 @@
 # coding:utf-8
 
+from collections import defaultdict
 from collections.abc import Iterable
+from typing import Any
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
-from typing import Generator
+from . import BaseProcessor
 
 
 class SSQData:
@@ -17,27 +19,31 @@ class SSQData:
             yield attr
 
 
-class AbstractExtractor(BaseProcessor):
+class SSQDetails:
     pass
 
 
-class RowDataExtractor(AbstractExtractor):
-    def __init__(self, table_box: FirefoxWebElement, tbody: str, colums_slice: slice):
-        self.table_box = table_box
-        self.tbody = tbody
-        self.delete_slice = delete_slice
-
-    def execute(self) -> Generator[SSQData, None, None]:
-        rows = self.table_box.find_elements(By.XPATH, self.tbody)
+class RowDataExtractor(BaseProcessor):
+    def execute(self):
+        rows = self.context_data.request.page.find_elements(By.XPATH, self.context_data.request.tbody)
+        self.context_data.response = defaultdict(list)
         for row in rows:
             columns = row.find_elements(By.TAG_NAME, 'td')
-            yield self.get_data_from_column(columns)
+            extract_data = self.get_data_from_column(columns)
+            if extract_data is Iterable:
+                self.context_data.response['data'].extend(extract_data)
+            else:
+                self.context_data.response['data'].append(extract_data)
 
+    def get_data_from_column(self, **kwargs) -> Any:
+        pass
+
+
+class BasePageDataExtractor(RowDataExtractor):
     def get_data_from_column(self, columns: FirefoxWebElement) -> SSQData:
         data = SSQData()
         data_next_attr = data.next_attr()
-        #del columns[5:11]
-        del columns[self.delete_slice]
+        del columns[5:11]
         for column in columns:
             span = column.find_elements(By.XPATH, 'span')
             if len(span) > 0 and isinstance(span, Iterable):
@@ -49,14 +55,6 @@ class RowDataExtractor(AbstractExtractor):
         return data
 
 
-def get_detail_data_from_column(columns):
-    return tuple([columns[index].text for index in range(len(columns))])
-
-
-
-
-if __name__ == '__main__':
-    s = SSQData()
-    s.id = 1
-    for i in s.__slots__:
-        setattr(s, i, s.id + 1)
+class DetailsPageDataExtractor(RowDataExtractor):
+    def get_data_from_column(self, columns: FirefoxWebElement):
+        return tuple([columns[index].text for index in range(len(columns))])
