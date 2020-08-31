@@ -1,7 +1,5 @@
 # coding:utf-8
 
-from abc import ABC
-from Spider import downloader
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
@@ -10,9 +8,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from .. import get_file_name
 from .. import logger
+from . import BaseProcessor
 
 
-class HtmlDownloader(ABC):
+class HtmlDownloader(BaseProcessor):
 
     def __init__(self, downloader=None):
         """
@@ -30,6 +29,11 @@ class HtmlDownloader(ABC):
     def __del__(self):
         logger.info('Close the browser')
         self.browser.quit()
+
+    def execute(self) -> WebElement:
+        logger.info('Execute in %s with data %s', self.__class__, self.context_data)
+        return self.get_page(**self.context_data)   
+
 
     def get_page(self, url: str, element_class: str, **kwargs) -> WebElement:
         '''
@@ -53,3 +57,4 @@ class DetailsPageDownloader(HtmlDownloader):
     def get_page(self, url: str, element_class: str) -> WebElement :
         self.browser.get(url)
         return self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME, element_class)))
+
