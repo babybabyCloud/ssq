@@ -1,7 +1,7 @@
 # coding:utf-8
 
-from collections import defaultdict
 from collections.abc import Iterable
+from dataclass import dataclass
 from typing import Any
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
@@ -19,28 +19,33 @@ class SSQData:
             yield attr
 
 
+@dataclass(repr=True)
 class SSQDetails:
-    pass
+    id: int
+    link: str
+    type: int
+    type_num: int
+    type_money: int
 
 
 class RowDataExtractor(BaseProcessor):
-    def execute(self):
-        rows = self.context_data.request.page.find_elements(By.XPATH, self.context_data.request.tbody)
-        self.context_data.response = defaultdict(list)
-        for row in rows:
-            columns = row.find_elements(By.TAG_NAME, 'td')
-            extract_data = self.get_data_from_column(columns)
-            if extract_data is Iterable:
-                self.context_data.response['data'].extend(extract_data)
-            else:
-                self.context_data.response['data'].append(extract_data)
+    def execute(self) -> None:
+        self.context_data.response = dict()
+        self.context_data.response.setdefault('data', list())
+        element_class = self.context_data.request.get('element_class')
+        pages = self.context_data.request.get('pages')
+        for page in pages:
+            rows = page.find_elements(By.XPATH, element_class)
+            for row in rows:
+                columns = row.find_elements(By.TAG_NAME, 'td')
+                self.get_data_from_column(columns)
 
     def get_data_from_column(self, **kwargs) -> Any:
         pass
 
 
 class BasePageDataExtractor(RowDataExtractor):
-    def get_data_from_column(self, columns: FirefoxWebElement) -> SSQData:
+    def get_data_from_column(self, columns: FirefoxWebElement, **kwargs) -> None:
         data = SSQData()
         data_next_attr = data.next_attr()
         del columns[5:11]
@@ -52,9 +57,9 @@ class BasePageDataExtractor(RowDataExtractor):
                 setattr(data, next(data_next_attr), column.find_element(By.TAG_NAME, 'a').get_attribute('href'))
             else:
                 setattr(data, next(data_next_attr), column.text)
-        return data
+            self.context_data.response.get('data').append(data)
 
 
 class DetailsPageDataExtractor(RowDataExtractor):
-    def get_data_from_column(self, columns: FirefoxWebElement):
+    def get_data_from_column(self, columns: FirefoxWebElement, **kwargs) -> None:
         return tuple([columns[index].text for index in range(len(columns))])

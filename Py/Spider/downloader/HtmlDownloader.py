@@ -6,9 +6,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as expected
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
+from typing import List
 from .. import get_file_name
 from .. import logger
 from . import BaseProcessor
+from .PageParser import SSQDetails
 
 
 class HtmlDownloader(BaseProcessor):
@@ -47,12 +49,16 @@ class BasePageDownloader(HtmlDownloader):
         '''
         self.browser.get(url)
         self.wait.until(expected.element_to_be_clickable((By.XPATH, max_condition))).click()
-        self.context_data.response = dict(page=self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME,
-                element_class))), tbody='//tbody/tr')
+        self.context_data.response = dict(pages=[self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME,
+                element_class)))], element_class='//tbody/tr')
 
 
 class DetailsPageDownloader(HtmlDownloader):
-    def get_page(self, url: str, element_class: str, **kwargs) -> WebElement :
-        self.browser.get(url)
-        self.context_data.response = dict(page=self.wait.until(expected.visibility_of_element_located((By.CLASS_NAME, 
-                element_class))), tbody='table/tbody/tr')
+    def get_page(self, details: List[SSQDetails], element_class: str, **kwargs) -> WebElement :
+        self.context_data.response = dict()
+        self.context_data.response.setdefault('pages', list())
+        for item in details:
+            self.browser.get(item.link)
+            self.context_data.response.get('pages').append(self.wait.until(
+                    expected.visibility_of_element_located((By.CLASS_NAME, element_class)))) 
+        self.context_data.response['element_class'] = 'table/tbody/tr'
