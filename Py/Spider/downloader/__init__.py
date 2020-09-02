@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict
 
-from sqlalchemy.orm.session import Session
-
 
 class QueryCountEnum(Enum):
     LOW = '30'
@@ -25,10 +23,8 @@ class AwardLevel(Enum):
 
 @dataclass(repr=True)
 class ProcessContext:
+    request: Dict[str, Any]
     response: Dict[str, Any]
-    session: Session
-    request: Dict[str, Any] = dict()
-
 
 
 class BaseProcessor(ABC):
@@ -38,6 +34,9 @@ class BaseProcessor(ABC):
         All parameters and return value would be instored in the context.
         Many processors would be put in an iterable object as a chain.
     '''
+    def __init__(self):
+            self.context_data = ProcessContext(request=None, response=None)
+
     def execute(self) -> None:
         '''
             Main process

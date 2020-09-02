@@ -1,11 +1,12 @@
 # coding:utf-8
 
 from collections.abc import Iterable
-from dataclass import dataclass
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, List
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
 from . import BaseProcessor
+from .. import logger
 
 
 class SSQData:
@@ -33,12 +34,11 @@ class RowDataExtractor(BaseProcessor):
         self.context_data.response = dict()
         self.context_data.response.setdefault('data', list())
         element_class = self.context_data.request.get('element_class')
-        pages = self.context_data.request.get('pages')
-        for page in pages:
-            rows = page.find_elements(By.XPATH, element_class)
-            for row in rows:
-                columns = row.find_elements(By.TAG_NAME, 'td')
-                self.get_data_from_column(columns)
+        page = self.context_data.request.get('page')
+        rows = page.find_elements(By.XPATH, element_class)
+        for row in rows:
+            columns = row.find_elements(By.TAG_NAME, 'td')
+            self.get_data_from_column(columns, **self.context_data.request)
 
     def get_data_from_column(self, **kwargs) -> Any:
         pass
@@ -57,9 +57,13 @@ class BasePageDataExtractor(RowDataExtractor):
                 setattr(data, next(data_next_attr), column.find_element(By.TAG_NAME, 'a').get_attribute('href'))
             else:
                 setattr(data, next(data_next_attr), column.text)
-            self.context_data.response.get('data').append(data)
+            logger.debug('Retrieve data %s', data)
+        self.context_data.response.get('data').append(data)
 
 
 class DetailsPageDataExtractor(RowDataExtractor):
-    def get_data_from_column(self, columns: FirefoxWebElement, **kwargs) -> None:
-        return tuple([columns[index].text for index in range(len(columns))])
+    def get_data_from_column(self, columns: List[FirefoxWebElement], detail: SSQDetails, **kwargs) -> None:
+        detail.type = columns[0].text
+        detail.type_num = columns[1].text
+        detail.type_money = columns[2].text
+        self.context_data.response.get('data').append(detail)
