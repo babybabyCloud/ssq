@@ -22,7 +22,7 @@ class HtmlDownloader(BaseProcessor):
         super().__init__()
         if downloader is None:
             self.__options = Options()
-            # self.__options.add_argument('-headless')
+            self.__options.add_argument('-headless')
             self.browser = Firefox(options=self.__options, executable_path=str(get_file_name(__file__, 'geckodriver')))
             self._wait = WebDriverWait(self.browser, 10)
         else:
@@ -64,4 +64,4 @@ class DetailsPageDownloader(HtmlDownloader, DetailsPageDataExtractor):
                 (By.CLASS_NAME, element_cls)))
             self.context_data.request['detail'] = item
             super(HtmlDownloader, self).execute()
-        logger.info(self.context_data.response)
+        logger.debug(self.context_data.response)

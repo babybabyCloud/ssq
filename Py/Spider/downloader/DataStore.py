@@ -1,10 +1,11 @@
 # encoding: utf-8
 
+from Spider.dbmodels.model import RecordDetails
 from . import BaseProcessor
-from .PageParser import SSQDetails
+from .PageParser import SSQData, SSQDetails
 from .. import logger
 from ..dbmodels import RecordBase, RecordDetail
-from ..dboperator.DBHandler import insert_base, insert_detail
+from ..dboperator.DBHandler import insert_base, insert_detail, insert_details
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm.session import Session
@@ -24,7 +25,7 @@ class DataStore(BaseProcessor):
 
 
 class BasePageDataStore(DataStore):
-    def store_record(self, data: List[RecordBase]) -> None:
+    def store_record(self, data: List[SSQData]) -> None:
         self.context_data.response = dict()
         self.context_data.response.setdefault('details', list())
         for row in data:
@@ -40,3 +41,12 @@ class BasePageDataStore(DataStore):
                     type_money=None)
             self.context_data.response.get('details').append(details)
         self.context_data.response['element_cls'] = 'zjqk'
+
+
+class DetailsPageDataStore(DataStore):
+    def store_record(self, data: List[SSQDetails]) -> None:
+        for item in data:
+            record_details = RecordDetails(id=item.id, type=item.type, type_num=item.type_num, 
+                    type_money=item.type_money)
+            insert_details(record_details)
+            logger.debug('Insert record_details %s' %record_details)

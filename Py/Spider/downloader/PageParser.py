@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, List
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
-from . import BaseProcessor
+from . import AwardLevel, BaseProcessor
 from .. import logger
 
 
@@ -23,6 +23,7 @@ class SSQData:
 @dataclass(repr=True)
 class SSQDetails:
     id: int
+    link: str
     type: int
     type_num: int
     type_money: int
@@ -30,7 +31,8 @@ class SSQDetails:
 
 class RowDataExtractor(BaseProcessor):
     def execute(self) -> None:
-        self.context_data.response = dict()
+        if self.context_data.response is None:
+            self.context_data.response= dict()
         self.context_data.response.setdefault('data', list())
         element_class = self.context_data.request.get('element_class')
         page = self.context_data.request.get('page')
@@ -76,6 +78,6 @@ class DetailsPageDataExtractor(RowDataExtractor):
             :param columns: The DOM where the data is extracted from.
             :param detail: The SSQDetails instance contained the id and link information
         '''
-        details = SSQDetails(id=detail.int(id), type=AwardLevel.name_to_value(columns[0].text), 
-                type_num=int(columns[1].text), type_money=int(columns[2].text))
+        details = SSQDetails(id=int(detail.id), type=AwardLevel.name_to_value(columns[0].text), 
+                type_num=int(columns[1].text), type_money=int(columns[2].text), link=None)
         self.context_data.response.get('data').append(details)
