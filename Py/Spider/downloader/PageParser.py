@@ -23,7 +23,6 @@ class SSQData:
 @dataclass(repr=True)
 class SSQDetails:
     id: int
-    link: str
     type: int
     type_num: int
     type_money: int
@@ -41,11 +40,19 @@ class RowDataExtractor(BaseProcessor):
             self.get_data_from_column(columns, **self.context_data.request)
 
     def get_data_from_column(self, **kwargs) -> Any:
+        '''
+            Extract data, the extracted data should be put into context_data.response
+        '''
         pass
 
 
 class BasePageDataExtractor(RowDataExtractor):
     def get_data_from_column(self, columns: FirefoxWebElement, **kwargs) -> None:
+        '''
+            Extract data from DOM
+
+            :param columns: The DOM where the data is extracted from.
+        '''
         data = SSQData()
         data_next_attr = data.next_attr()
         del columns[5:11]
@@ -63,7 +70,12 @@ class BasePageDataExtractor(RowDataExtractor):
 
 class DetailsPageDataExtractor(RowDataExtractor):
     def get_data_from_column(self, columns: List[FirefoxWebElement], detail: SSQDetails, **kwargs) -> None:
-        detail.type = columns[0].text
-        detail.type_num = columns[1].text
-        detail.type_money = columns[2].text
-        self.context_data.response.get('data').append(detail)
+        '''
+            Extract data from DOM
+
+            :param columns: The DOM where the data is extracted from.
+            :param detail: The SSQDetails instance contained the id and link information
+        '''
+        details = SSQDetails(id=detail.int(id), type=AwardLevel.name_to_value(columns[0].text), 
+                type_num=int(columns[1].text), type_money=int(columns[2].text))
+        self.context_data.response.get('data').append(details)

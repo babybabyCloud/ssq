@@ -20,6 +20,16 @@ class AwardLevel(Enum):
     五等奖 = 5
     六等奖 = 6
 
+    @classmethod
+    def name_to_value(cls, name) -> int:
+        '''
+            Get the value from this enum according to the name
+        '''
+        value_member = cls.__members__.get(name)
+        if value_member is None:
+            raise ValueError('No entry for %s' %name)
+        return value_member.value
+
 
 @dataclass(repr=True)
 class ProcessContext:
