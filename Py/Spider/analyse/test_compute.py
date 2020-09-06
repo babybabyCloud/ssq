@@ -52,8 +52,4 @@ class ComputeTest(unittest.TestCase):
             self.assertEqual(sum / self._default_limit, item[1])
 
     def test_1_read_needed_compute_data(self):
-        self.assertEqual([2018098, 2018099], read_needed_compute_data(self._default_limit, self.session))
-        
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual([2018098, 2018099, 2019001], read_needed_compute_data(self._default_limit, self.session))

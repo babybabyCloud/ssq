@@ -6,3 +6,5 @@
 *egg*
 pyvenv.cfg
 .vscode/
+htmlcov/
+.coverage

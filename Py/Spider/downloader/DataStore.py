@@ -48,5 +48,5 @@ class DetailsPageDataStore(DataStore):
         for item in data:
             record_details = RecordDetails(id=item.id, type=item.type, type_num=item.type_num, 
                     type_money=item.type_money)
-            insert_details(record_details)
+            insert_details(record_details, self._session)
             logger.debug('Insert record_details %s' %record_details)

@@ -24,18 +24,3 @@ def insert_details(record_details: RecordDetails, session: Session):
 
 def select_base_all(session: Session):
     return session.query(RecordBase).order_by(RecordBase.id).all()
-
-def pop_file_with_pattern(path, pattern):
-    import os
-    import fnmatch
-    import heapq
-    sql_files = []
-    for _, _, files in os.walk(path):
-        for file in fnmatch.filter(files, pattern):
-            heapq.heappush(sql_files, file)
-
-    def get():
-        for index in range(len(sql_files)):
-            yield heapq.heappop(sql_files)
-
-    return get

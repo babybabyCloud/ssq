@@ -26,7 +26,7 @@ class Manager:
         bpd = BasePageDataStore(self._session)
         dpd = DetailsPageDownloader(bd)
         dpds = DetailsPageDataStore(self._session)
-        return (bd, bde, bpd, dpd)
+        return (bd, bde, bpd, dpd, dpds)
 
     def start(self, url: str):
         _ctx = ProcessContext(response=dict(url=START_PAGE, \
@@ -38,7 +38,7 @@ class Manager:
             processor.execute()
             _ctx = processor.context_data
 
-        self.session.commit()
+        self._session.commit()
         logger.info('Pulling completed!')
         self.start_compute()
 
