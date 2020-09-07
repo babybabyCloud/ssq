@@ -28,7 +28,7 @@ class Manager:
         dpds = DetailsPageDataStore(self._session)
         return (bd, bde, bpd, dpd, dpds)
 
-    def start(self, url: str):
+    def start(self):
         _ctx = ProcessContext(response=dict(url=START_PAGE, \
                 element_class='bgzt', max_condition='//li[@data-xq=%s]' %self._query_count), request=None)
 
@@ -54,9 +54,8 @@ class Manager:
 
 def main(**kwargs):
     manager = Manager(**kwargs)
-    url = START_PAGE
-    logger.info('Start pulling from %s' %url)
-    manager.start(url)
+    logger.info('Start pulling from %s' %START_PAGE)
+    manager.start()
 
 
 if __name__ == '__main__':

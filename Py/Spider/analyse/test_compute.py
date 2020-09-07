@@ -50,6 +50,7 @@ class ComputeTest(unittest.TestCase):
                     break
             # Compare the mean calculated by above to read from table
             self.assertEqual(sum / self._default_limit, item[1])
+            # Won't test for error scenario
 
     def test_1_read_needed_compute_data(self):
         self.assertEqual([2018098, 2018099, 2019001], read_needed_compute_data(self._default_limit, self.session))
