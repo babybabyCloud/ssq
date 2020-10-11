@@ -12,10 +12,10 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('sub_command', action=argumentsparser.SubCommandAction, 
-        choices=[item.value for item in list(SubCommandType)])
+    parser.add_argument('sub_command', action=argumentsparser.SubCommandAction,
+                        choices=[item.value for item in list(SubCommandType)])
     parser.add_argument('sub_args', nargs=argparse.REMAINDER)
-    return parser.parse_args(sys.argv[1:])
+    return parser.parse_args()
 
 
 if __name__ == '__main__':

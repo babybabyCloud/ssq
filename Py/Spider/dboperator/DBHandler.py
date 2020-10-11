@@ -1,43 +1,26 @@
 # coding:utf-8
 
 from ..dbmodels import *
+from sqlalchemy.orm.session import Session
 
 
-class DbHandler:
-    def insert_base(self, identify, reds, blue, date, session):
-        if session.query(RecordBase).filter(RecordBase.id == identify).count() <= 0 :
-            record = RecordBase(id=identify, red1=reds[0], red2=reds[1], red3=reds[2], red4=reds[3], red5=reds[4], red6=reds[5],
-                blue=blue, date_=date)
-            session.add(record)
+def insert_base(record_base: RecordBase, session: Session):
+    if session.query(RecordBase).filter(RecordBase.id == record_base.id).count() <= 0 :
+        session.add(record_base)
 
-    def insert_detail(self, identify, week, sales, money, link, session):
-        if session.query(RecordDetail).filter(RecordDetail.id == identify).count() <= 0 :
-            record = RecordDetail(id=identify, week=week, sales=sales, pool_money=money, detail_link=link)
-            session.add(record)
+def insert_detail(record_detail: RecordDetail, session: Session):
+    if session.query(RecordDetail).filter(RecordDetail.id == record_detail.id).count() <= 0 :
+        session.add(record_detail)
 
-    def insert_details(self, identify, tp, type_num, money, session):
-        if session.query(RecordDetails) \
-                .filter(RecordDetails.id == identify) \
-                .filter(RecordDetails.type == tp) \
-                .filter(RecordDetails.type_num == type_num) \
-                .filter(RecordDetails.type_money == money) \
-                .count() > 0:
-            return
-        record = RecordDetails(id=identify, type=tp, type_num=type_num, type_money=money)
-        session.add(record)
+def insert_details(record_details: RecordDetails, session: Session):
+    if session.query(RecordDetails) \
+            .filter(RecordDetails.id == record_details.id) \
+            .filter(RecordDetails.type == record_details.type) \
+            .filter(RecordDetails.type_num == record_details.type_num) \
+            .filter(RecordDetails.type_money == record_details.type_money) \
+            .count() > 0:
+        return
+    session.add(record_details)
 
-
-def pop_file_with_pattern(path, pattern):
-    import os
-    import fnmatch
-    import heapq
-    sql_files = []
-    for _, _, files in os.walk(path):
-        for file in fnmatch.filter(files, pattern):
-            heapq.heappush(sql_files, file)
-
-    def get():
-        for index in range(len(sql_files)):
-            yield heapq.heappop(sql_files)
-
-    return get
+def select_base_all(session: Session):
+    return session.query(RecordBase).order_by(RecordBase.id).all()

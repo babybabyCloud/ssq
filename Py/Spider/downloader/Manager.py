@@ -1,11 +1,13 @@
 #! coding:utf-8
 
+from . import ProcessContext
+from .DataStore import BasePageDataStore, DetailsPageDataStore
+from .HtmlDownloader import BasePageDownloader, DetailsPageDownloader
+from .PageParser import BasePageDataExtractor
 from .. import logger
-from ..downloader.HtmlDownloader import HtmlDownloader
-from ..dboperator.DBHandler import DbHandler
-from ..downloader.PageParser import PageParser
-from ..downloader import AwardLevel
+from ..dboperator.DBHandler import *
 from ..dboperator import new_session
+from ..dbmodels import *
 from datetime import datetime
 
 START_PAGE = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
@@ -14,45 +16,46 @@ START_PAGE = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
 class Manager:
 
     def __init__(self, db_file, query_count):
-        self.downloader = HtmlDownloader()
-        self.db = DbHandler()
-        self.page_parser = PageParser()
         self._query_count = query_count
-        self.session = new_session('sqlite:///%s' % db_file)
+        self._session = new_session('sqlite:///%s' % db_file)
+        self._processors_chains = self.init_chain()
 
-    def start(self, url):
-        details_page = []
-        table_box = self.downloader.get_page(url, 'bgzt', '//li[@data-xq=%s]' % self._query_count)
-        row_gen = self.page_parser.get_row_data(table_box, PageParser.get_data_from_column, '//tbody/tr')
-        for row in row_gen:
-            self.db.insert_base(row.id, row.reds, row.blue[0], datetime.strptime(row.date[:-3], '%Y-%m-%d'), self.session)
-            self.db.insert_detail(row.id, row.date[-2:-1], row.total, row.pool, row.detail_link, self.session)
-            details_page.append((row.id, row.detail_link))
+    def init_chain(self):
+        bd = BasePageDownloader()
+        bde = BasePageDataExtractor()
+        bpd = BasePageDataStore(self._session)
+        dpd = DetailsPageDownloader(bd)
+        dpds = DetailsPageDataStore(self._session)
+        return (bd, bde, bpd, dpd, dpds)
 
-        for page in details_page:
-            try:
-                detail_table = self.downloader.get_page(page[1], 'zjqk')
-            except Exception as e:
-                logger.error("Error page %s" % page[1])
-                continue
-            for i in self.page_parser.get_row_data(detail_table,
-                    PageParser.get_detail_data_from_column, 'table/tbody/tr'):
-                tp = None
-                for name, member in AwardLevel.__members__.items():
-                    if name == i[0]:
-                        tp = member.value
-                        break
-                if tp:
-                    self.db.insert_details(page[0], tp, i[1], i[2], self.session)
-        self.session.commit()
+    def start(self):
+        _ctx = ProcessContext(response=dict(url=START_PAGE, \
+                element_class='bgzt', max_condition='//li[@data-xq=%s]' %self._query_count), request=None)
+
+        for processor in self._processors_chains:
+            processor.context_data.request = _ctx.response
+            processor.context_data.response = None
+            processor.execute()
+            _ctx = processor.context_data
+
+        self._session.commit()
         logger.info('Pulling completed!')
+        self.start_compute()
+
+
+    def start_compute(self):
+        logger.info('Start compute mean')
+
+        from ..analyse.compute import compute_means
+        from ..dboperator import get_engine
+
+        compute_means(get_engine(), int(self._query_count))
 
 
 def main(**kwargs):
     manager = Manager(**kwargs)
-    url = START_PAGE
-    logger.info('Start pulling from %s' %url)
-    manager.start(url)
+    logger.info('Start pulling from %s' %START_PAGE)
+    manager.start()
 
 
 if __name__ == '__main__':
