@@ -4,6 +4,7 @@ from .. import logger
 from ..dboperator import *
 from ..dbmodels.model import RecordBase
 import pandas as pd
+from sqlalchemy import outerjoin, and_
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
 from typing import Iterable
@@ -12,7 +13,12 @@ from typing import Iterable
 __DEFAULT_LIMIT = 30
 
 
-def compute_means(engine: Engine, limit: int = __DEFAULT_LIMIT):
+def compute_means(engine: Engine, limit: int = __DEFAULT_LIMIT, /):
+    """
+    Compute the mean
+    :param engine: The DB engine object
+    :param limit: The type of the limit to be computed
+    """
     session = new_session_with_engine(engine)
     needed_computed_ids = read_needed_compute_data(limit, session)
     logger.debug('The ids: %s will be computed, the mean for type %d' %(needed_computed_ids, limit))
@@ -33,13 +39,19 @@ def compute_means(engine: Engine, limit: int = __DEFAULT_LIMIT):
     logger.info('Mean compute complete!')
 
 
-def read_needed_compute_data(limit: int, session: Session) -> Iterable[int]:
-    rb = session.query(RecordBase.id).order_by(RecordBase.id).offset(limit-1).limit(1).one()
-    logger.info('Start from id %s' %rb)
-    ids = session.query(RecordBase.id) \
-            .outerjoin(RecordsMean) \
-            .filter(RecordsMean.id == None) \
-            .filter(RecordBase.id >= rb[0]) \
-            .order_by(RecordBase.id) \
-            .all()
+def read_needed_compute_data(offset: int, session: Session, /) -> Iterable[int]:
+    """
+    Query those needs calculated id of the recoreds
+    :param offset: The offset is to be skipped
+    :param session: The DB session object
+    :return: The ids.
+    """
+    rb_limit_cte = session.query(RecordBase).order_by(RecordBase.id).limit(-1).offset(offset-1).cte()
+    ids = session.query(rb_limit_cte.c.id)\
+           .select_from(outerjoin(rb_limit_cte, \
+                                  RecordsMean, \
+                                  and_(rb_limit_cte.c.id == RecordsMean.id, RecordsMean.id == offset)))\
+           .filter(RecordsMean.id == None)\
+           .order_by(rb_limit_cte.c.id)\
+           .all()
     return [inner for outer in ids for inner in outer]
