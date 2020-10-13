@@ -50,7 +50,7 @@ def read_needed_compute_data(offset: int, session: Session, /) -> Iterable[int]:
     ids = session.query(rb_limit_cte.c.id)\
            .select_from(outerjoin(rb_limit_cte, \
                                   RecordsMean, \
-                                  and_(rb_limit_cte.c.id == RecordsMean.id, RecordsMean.id == offset)))\
+                                  and_(rb_limit_cte.c.id == RecordsMean.id, RecordsMean.type == offset)))\
            .filter(RecordsMean.id == None)\
            .order_by(rb_limit_cte.c.id)\
            .all()

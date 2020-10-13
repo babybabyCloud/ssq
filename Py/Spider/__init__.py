@@ -13,10 +13,6 @@ def get_file_name(file_path, target_name):
         return PurePath(directory, target_name)
 
 
-with open(str(get_file_name(__file__, 'logging.json'))) as f:
-    config = json.load(f)
-    dictConfig(config)
-
 logger = logging.getLogger('default')
 
 class SubCommandType(Enum):

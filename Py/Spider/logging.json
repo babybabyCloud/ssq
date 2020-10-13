@@ -1,18 +1,18 @@
 {
     "version":1,
-    "formatters":{
-		"default":{
-			"fmt":"%(asctime)s-%(levelname)s %(filename)s:%(lineno)s - %(message)s"
+    "formatters": {
+		"default": {
+			"fmt":"%(asctime)s-%(levelname)s %(name)s - %(message)s"
 		}
     },
-    "handlers":{
-        "console":{
+    "handlers": {
+        "console": {
             "class":"logging.StreamHandler",
             "formatter":"default",
             "level":"INFO",
             "stream":"ext://sys.stdout"
         },
-        "file":{
+        "file": {
             "class":"logging.FileHandler",
             "formatter":"default",
             "level":"DEBUG",
@@ -20,13 +20,19 @@
 			"encoding": "utf-8"
         }
     },
-    "loggers":{
-        "default":{
+    "loggers": {
+        "Spider": {
             "handlers":[
                 "console",
                 "file"
             ],
             "level": "INFO"
         }
+    },
+    "root": {
+        "handlers":[
+            "console"
+        ],
+        "level": "INFO"
     }
 }
