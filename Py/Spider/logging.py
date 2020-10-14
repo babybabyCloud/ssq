@@ -4,6 +4,7 @@ import json
 import logging
 import re
 from logging.config import dictConfig
+from threading import Lock
 from typing import Mapping, List
 
 from . import get_file_name
@@ -11,6 +12,8 @@ from . import get_file_name
 
 class LoggerFactory:
     config: Mapping[str, Mapping] = None
+    logger_register = set()
+    _lock =  Lock()
     __DEFAULT_CONFIG_FILE = 'logging.json'
     __LOGGERS_KEY = 'loggers'
 
@@ -54,18 +57,43 @@ class LoggerFactory:
             match_name = f"{parent_logger_name}.".repalce('.', '\.')
             prefix_regexp = re.compile(match_name)
             child_logger_name_suffix = prefix_regexp.sub('', name, 1)
-            logger = logging.getLogger(parent_logger_name).getChild(child_logger_name_suffix)
+            parent_logger = logging.getLogger(parent_logger_name)
+            logger = parent_logger.getChild(child_logger_name_suffix)
+            cls.configure_parent_logger(logger, **kwargs)
+            cls.configure_logger(parent_logger, logger)
+        return logger
         
 
-    def configure_logger(logger: logging.Logger, **kwargs) -> None:
+    @classmethod
+    def configure_parent_logger(cls, logger: logging.Logger, **kwargs) -> None:
         """
         Configure the logger.
         :param logger: The logger to be configured
         :param log_level: The log level is configured to the logger
         :param log_path: The log path is configured to the logger is the logger is a logging.FileHandler
         """
-        if log_level := kwargs.get('log_level') != None:
-            logger.setLevel(log_level)
-        if log_des := kwargs.get('log_des') != None:
-            for handler in filter(lambda h: isinstance(h, logging.FileHandler), logger.handlers):
-                handler.
+        with cls._lock:
+            if logger not in cls.logger_register:
+                log_level = kwargs.get('log_level')
+                if log_level != None:
+                    logger.setLevel(log_level)
+                if log_des := kwargs.get('log_des') != None:
+                    for handler in filter(lambda h: isinstance(h, logging.FileHandler), logger.handlers):
+                        handler.stream = open(log_des, 'a+')
+                        handler.setLevel(log_level)
+                cls.logger_register.add(logger)
+    
+
+    @staticmethod
+    def configure_logger(parent: logging.Logger, child: logging.Logger) -> None:
+        """
+        Copy the attributes from parent to child
+        :param parent: The parent
+        :param child: The child
+        """
+        for attr in ["level", "propagate", "filters", "handlers"]:
+            setattr(child, attr, getattr(parent, attr))
+        # child.setLevel(parent.level)
+        # child.propagate = parent.propagate
+        # child.filters = parent.filters
+        # child.handlers = parent.handlers
