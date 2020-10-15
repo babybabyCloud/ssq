@@ -32,7 +32,7 @@ class LoggerFactory:
 
     
     @classmethod
-    def get_logger(cls, name: str, /, **kwargs) -> logging.Logger:
+    def get_logger(cls, name: str = "", /, **kwargs) -> logging.Logger:
         """
         Get the logger
         :param name: The name of logger
