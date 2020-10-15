@@ -1,14 +1,17 @@
 # encoding: utf-8
 
-from Spider.dbmodels.model import RecordDetails
+from Spider.logging import LoggerFactory
 from . import BaseProcessor
 from .PageParser import SSQData, SSQDetails
-from .. import logger
-from ..dbmodels import RecordBase, RecordDetail
+from ..dbmodels import RecordBase, RecordDetail, RecordDetails
 from ..dboperator.DBHandler import insert_base, insert_detail, insert_details
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm.session import Session
+
+
+logger = LoggerFactory.get_logger(__name__)
+print('TESTTEST')
 
 
 class DataStore(BaseProcessor):

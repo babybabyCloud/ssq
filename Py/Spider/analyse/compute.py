@@ -1,9 +1,9 @@
 # encoding: utf-8
 
-from .. import logger
 from ..dboperator import *
-from ..dbmodels.model import RecordBase
+from ..dbmodels.model import RecordBase, RecordsMean
 import pandas as pd
+from Spider.logging import LoggerFactory
 from sqlalchemy import outerjoin, and_
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
@@ -11,6 +11,7 @@ from typing import Iterable
 
 
 __DEFAULT_LIMIT = 30
+logger = LoggerFactory.get_logger(__name__)
 
 
 def compute_means(engine: Engine, limit: int = __DEFAULT_LIMIT, /):

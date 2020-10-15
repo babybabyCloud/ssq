@@ -6,7 +6,10 @@ from typing import Any, List
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
 from . import AwardLevel, BaseProcessor
-from .. import logger
+from Spider.logging import LoggerFactory
+
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 class SSQData:

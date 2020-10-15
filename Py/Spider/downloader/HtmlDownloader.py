@@ -7,10 +7,13 @@ from selenium.webdriver.support import expected_conditions as expected
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from typing import List
-from .. import get_file_name
-from .. import logger
 from . import BaseProcessor
 from .PageParser import SSQDetails, DetailsPageDataExtractor
+from .. import get_file_name
+from Spider.logging import LoggerFactory
+
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 class HtmlDownloader(BaseProcessor):
@@ -22,7 +25,7 @@ class HtmlDownloader(BaseProcessor):
         super().__init__()
         if downloader is None:
             self.__options = Options()
-            self.__options.add_argument('-headless')
+            # self.__options.add_argument('-headless')
             self.browser = Firefox(options=self.__options, executable_path=str(get_file_name(__file__, 'geckodriver')))
             self._wait = WebDriverWait(self.browser, 10)
         else:

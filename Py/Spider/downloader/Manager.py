@@ -4,18 +4,19 @@ from . import ProcessContext
 from .DataStore import BasePageDataStore, DetailsPageDataStore
 from .HtmlDownloader import BasePageDownloader, DetailsPageDownloader
 from .PageParser import BasePageDataExtractor
-from .. import logger
 from ..dboperator.DBHandler import *
 from ..dboperator import new_session
 from ..dbmodels import *
-from datetime import datetime
+from Spider.logging import LoggerFactory
+
 
 START_PAGE = r'http://www.cwl.gov.cn/kjxx/ssq/kjgg/'
+logger = LoggerFactory.get_logger(__name__)
 
 
 class Manager:
 
-    def __init__(self, db_file, query_count):
+    def __init__(self, db_file: str, query_count: str) -> None:
         self._query_count = query_count
         self._session = new_session('sqlite:///%s' % db_file)
         self._processors_chains = self.init_chain()
@@ -52,11 +53,7 @@ class Manager:
         compute_means(get_engine(), int(self._query_count))
 
 
-def main(**kwargs):
-    manager = Manager(**kwargs)
+def main(*args):
+    manager = Manager(*args)
     logger.info('Start pulling from %s' %START_PAGE)
     manager.start()
-
-
-if __name__ == '__main__':
-    main()
