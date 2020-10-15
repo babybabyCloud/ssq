@@ -54,7 +54,7 @@ class LoggerFactory:
             logger = logging.getLogger()
         else:
             parent_logger_name = logger_names.pop()
-            match_name = f"{parent_logger_name}.".repalce('.', '\.')
+            match_name = f"{parent_logger_name}.".replace('.', '\.')
             prefix_regexp = re.compile(match_name)
             child_logger_name_suffix = prefix_regexp.sub('', name, 1)
             parent_logger = logging.getLogger(parent_logger_name)
