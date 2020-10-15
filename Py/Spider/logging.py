@@ -93,7 +93,3 @@ class LoggerFactory:
         """
         for attr in ["level", "propagate", "filters", "handlers"]:
             setattr(child, attr, getattr(parent, attr))
-        # child.setLevel(parent.level)
-        # child.propagate = parent.propagate
-        # child.filters = parent.filters
-        # child.handlers = parent.handlers
