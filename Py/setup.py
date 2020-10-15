@@ -6,9 +6,16 @@ setup(
     name='ssq',
     version='0.3.1',
 	packages=find_packages(),
-    install_requires=['selenium>=3.141.0', 'SQLAlchemy'],
+    install_requires=[
+        'selenium>=3.141.0', 
+        'SQLAlchemy==1.3.20', 
+        'click==7.1.2'
+    ],
     package_data={
-        'Spider': ['logging.json', 'downloader/geckodriver', 'SQLite/SQL/*.sql']
+        'Spider': [
+            'logging.json', 
+            'downloader/geckodriver'
+        ]
     },
 	entry_points={
 		'console_scripts': [

@@ -10,6 +10,11 @@ from typing import Mapping, List
 from . import get_file_name
 
 
+LOG_LEVEL_STR = 'log_level'
+LOG_DEST_STR = 'log_dest'
+LOG_CONFIG_PATH_STR = 'config_path'
+
+
 class LoggerFactory:
     config: Mapping[str, Mapping] = None
     logger_register = set()
@@ -18,7 +23,7 @@ class LoggerFactory:
     __LOGGERS_KEY = 'loggers'
 
     @classmethod
-    def init_log_config(cls, config_path: str = __DEFAULT_CONFIG_FILE, /) -> None:
+    def init_log_config(cls, *, config_path: str = __DEFAULT_CONFIG_FILE, **kwargs) -> None:
         """
         Init the log config
         :param config_path: The full path of config file.
@@ -29,10 +34,12 @@ class LoggerFactory:
         with open(path) as f:
             cls.config = json.load(f)
             dictConfig(cls.config)
+        
+        cls.extra_args = kwargs
 
     
     @classmethod
-    def get_logger(cls, name: str = "", /, **kwargs) -> logging.Logger:
+    def get_logger(cls, name: str = "", /) -> logging.Logger:
         """
         Get the logger
         :param name: The name of logger
@@ -59,13 +66,13 @@ class LoggerFactory:
             child_logger_name_suffix = prefix_regexp.sub('', name, 1)
             parent_logger = logging.getLogger(parent_logger_name)
             logger = parent_logger.getChild(child_logger_name_suffix)
-            cls.configure_parent_logger(logger, **kwargs)
+            cls.configure_parent_logger(logger)
             cls.configure_logger(parent_logger, logger)
         return logger
         
 
     @classmethod
-    def configure_parent_logger(cls, logger: logging.Logger, **kwargs) -> None:
+    def configure_parent_logger(cls, logger: logging.Logger) -> None:
         """
         Configure the logger.
         :param logger: The logger to be configured
@@ -74,10 +81,10 @@ class LoggerFactory:
         """
         with cls._lock:
             if logger not in cls.logger_register:
-                log_level = kwargs.get('log_level')
+                log_level = cls.extra_args.get(LOG_LEVEL_STR)
                 if log_level != None:
                     logger.setLevel(log_level)
-                if log_des := kwargs.get('log_des') != None:
+                if log_des := cls.extra_args.get(LOG_DEST_STR) != None:
                     for handler in filter(lambda h: isinstance(h, logging.FileHandler), logger.handlers):
                         handler.stream = open(log_des, 'a+')
                         handler.setLevel(log_level)
