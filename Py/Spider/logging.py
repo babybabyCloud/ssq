@@ -1,11 +1,11 @@
 # encoding: utf-8
 
-import json
 import logging
-import re
+from dataclasses import dataclass
 from logging.config import dictConfig
+from io import FileIO
 from threading import Lock
-from typing import Mapping, List
+from typing import Dict, List
 
 from . import get_file_name
 
@@ -15,42 +15,56 @@ LOG_DEST_STR = 'log_dest'
 LOG_CONFIG_PATH_STR = 'config_path'
 
 
+@dataclass
+class LogConfig:
+    log_level: str = None
+    log_path: str = None
+
+
 class LoggerFactory:
-    config: Mapping[str, Mapping] = None
-    logger_register = set()
-    _lock =  Lock()
+    """
+    The factory class to get Logger instance.
+    """
+    _config: Dict[str, Dict] = None
     __DEFAULT_CONFIG_FILE = 'logging.json'
     __LOGGERS_KEY = 'loggers'
+    __LOCK = Lock()
+    __init = False
 
     @classmethod
-    def init_log_config(cls, *, config_path: str = __DEFAULT_CONFIG_FILE, **kwargs) -> None:
+    def _init_log_config(cls, *, config_path: str = __DEFAULT_CONFIG_FILE, **kwargs) -> None:
         """
         Init the log config
         :param config_path: The full path of config file.
         """
-        path = config_path
-        if config_path == cls.__DEFAULT_CONFIG_FILE:
-            path = str(get_file_name(__file__, config_path))
-        with open(path) as f:
-            cls.config = json.load(f)
-            dictConfig(cls.config)
-        
-        cls.extra_args = kwargs
+        with cls.__LOCK:
+            if cls.__init:
+                return
+            path = config_path
+            if config_path == cls.__DEFAULT_CONFIG_FILE:
+                path = str(get_file_name(__file__, config_path))
+            with open(path) as f:
+                cls._config = cls._read_config(f)
+                dictConfig(cls._config)
+            
+            cls.log_config = LogConfig(**kwargs)
+            cls._reconfig_logger()
+            cls.__init == False
 
     
     @classmethod
-    def get_logger(cls, name: str = "", /) -> logging.Logger:
+    def get_logger(cls, name: str = "", /, **kwargs) -> logging.Logger:
         """
         Get the logger
         :param name: The name of logger
         """
-        assert cls.config != None, '"LoggerFactory.init_log_config" must be called first'
+        cls._init_log_config(**kwargs)
 
         logger_names: List[str] = list(
             sorted(
                 filter(
                     lambda logger_name: name.startswith(logger_name), 
-                    cls.config.get(cls.__LOGGERS_KEY).keys()
+                    cls._config.get(cls.__LOGGERS_KEY).keys()
                 ), 
             key=len)
         )
@@ -58,45 +72,40 @@ class LoggerFactory:
         # Get the correct logger
         logger = None
         if len(logger_names) == 0:
-            logger = logging.getLogger()
+            logger = logging.getLogger('default')
         else:
-            parent_logger_name = logger_names.pop()
-            match_name = f"{parent_logger_name}.".replace('.', '\.')
-            prefix_regexp = re.compile(match_name)
-            child_logger_name_suffix = prefix_regexp.sub('', name, 1)
-            parent_logger = logging.getLogger(parent_logger_name)
-            logger = parent_logger.getChild(child_logger_name_suffix)
-            cls.configure_parent_logger(logger)
-            cls.configure_logger(parent_logger, logger)
+            logger = logging.getLogger(name)
         return logger
-        
+
 
     @classmethod
-    def configure_parent_logger(cls, logger: logging.Logger) -> None:
+    def _reconfig_logger(cls) -> None:
         """
-        Configure the logger.
-        :param logger: The logger to be configured
-        :param log_level: The log level is configured to the logger
-        :param log_path: The log path is configured to the logger is the logger is a logging.FileHandler
+        The config could be overridden by CLI arguments or Environment variables.
+        This will reset those values.
         """
-        with cls._lock:
-            if logger not in cls.logger_register:
-                log_level = cls.extra_args.get(LOG_LEVEL_STR)
+        loggers = cls._config.get(cls.__LOGGERS_KEY)
+        for logger_name in loggers.keys():
+            logger = logging.getLogger(logger_name)
+            log_level = cls.log_config.log_level
+            if  log_level != None:
+                logger.setLevel(log_level)
+            for handler in logger.handlers:
                 if log_level != None:
-                    logger.setLevel(log_level)
-                if log_des := cls.extra_args.get(LOG_DEST_STR) != None:
-                    for handler in filter(lambda h: isinstance(h, logging.FileHandler), logger.handlers):
-                        handler.stream = open(log_des, 'a+')
-                        handler.setLevel(log_level)
-                cls.logger_register.add(logger)
-    
+                    handler.setLevel(cls.log_config.log_level)
+                if isinstance(handler, logging.StreamHandler):
+                    if log_path := cls.log_config.log_path != None:
+                        handler.setStream(open(log_path, 'a+'))
+        
 
     @staticmethod
-    def configure_logger(parent: logging.Logger, child: logging.Logger) -> None:
+    def _read_config(config_file: FileIO) -> Dict[str, Dict]:
         """
-        Copy the attributes from parent to child
-        :param parent: The parent
-        :param child: The child
+        Read the config. This now only supports json format.
+        :param config_file: The fd of the config file.
+        :return: dict-like object
         """
-        for attr in ["level", "propagate", "filters", "handlers"]:
-            setattr(child, attr, getattr(parent, attr))
+        if config_file.name.endswith('json'):
+            import json
+            return json.load(config_file)
+        return dict()

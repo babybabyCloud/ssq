@@ -5,11 +5,12 @@ from setuptools import setup, find_packages
 setup(
     name='ssq',
     version='0.3.1',
-	packages=find_packages(),
+    packages=find_packages(),
     install_requires=[
         'selenium>=3.141.0', 
         'SQLAlchemy==1.3.20', 
-        'click==7.1.2'
+        'click==7.1.2',
+        'pandas==1.1.3'
     ],
     package_data={
         'Spider': [
