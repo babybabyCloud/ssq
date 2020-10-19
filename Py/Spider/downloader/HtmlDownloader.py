@@ -25,16 +25,25 @@ class HtmlDownloader(BaseProcessor):
         super().__init__()
         if downloader is None:
             self.__options = Options()
-            # self.__options.add_argument('-headless')
+            self.__options.add_argument('-headless')
             self.browser = Firefox(options=self.__options, executable_path=str(get_file_name(__file__, 'geckodriver')))
             self._wait = WebDriverWait(self.browser, 10)
         else:
             self.browser = downloader.browser
             self._wait = downloader._wait
 
+
     def execute(self) -> None:
         logger.debug('Execute in %s with data %s', self.__class__, self.context_data.request)
         self.get_page(**self.context_data.request)
+
+
+    def close(self):
+        """
+        Close the browser
+        """
+        self.browser.close()
+
 
     def get_page(self, url: str, element_class: str, **kwargs) -> WebElement:
         pass

@@ -11,7 +11,6 @@ from sqlalchemy.orm.session import Session
 
 
 logger = LoggerFactory.get_logger(__name__)
-print('TESTTEST')
 
 
 class DataStore(BaseProcessor):

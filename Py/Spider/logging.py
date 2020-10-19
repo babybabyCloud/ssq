@@ -32,7 +32,7 @@ class LoggerFactory:
     __init = False
 
     @classmethod
-    def _init_log_config(cls, *, config_path: str = __DEFAULT_CONFIG_FILE, **kwargs) -> None:
+    def init_log_config(cls, *, config_path: str = __DEFAULT_CONFIG_FILE, **kwargs) -> None:
         """
         Init the log config
         :param config_path: The full path of config file.
@@ -53,13 +53,11 @@ class LoggerFactory:
 
     
     @classmethod
-    def get_logger(cls, name: str = "", /, **kwargs) -> logging.Logger:
+    def get_logger(cls, name: str = "", /) -> logging.Logger:
         """
         Get the logger
         :param name: The name of logger
         """
-        cls._init_log_config(**kwargs)
-
         logger_names: List[str] = list(
             sorted(
                 filter(

@@ -4,7 +4,7 @@ from datetime import date, datetime
 from enum import Enum
 
 
-__DATE_FORMAT = '%Y-%m-%d'
+_DATE_FORMAT = '%Y-%m-%d'
 
 
 def get_file_name(file_path, target_name):
@@ -14,7 +14,7 @@ def get_file_name(file_path, target_name):
     return PurePath(directory, target_name)
 
 
-def strptime(date_string, format=__DATE_FORMAT) -> date:
+def strptime(date_string, format=_DATE_FORMAT) -> date:
     """
     Covert a date string to date according to the format string.
     :param date_string: The string to be converted.

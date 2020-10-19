@@ -2,9 +2,13 @@
 
 import csv
 import unittest
+from Spider.logging import LoggerFactory
+# Init logger for UT.
+LoggerFactory.init_log_config()
+
 from .compute import *
 from .. import get_file_name
-from ..argumentsparser import strptime
+from .. import strptime
 
 
 _MEMORY_URL = 'sqlite:///:memory:'

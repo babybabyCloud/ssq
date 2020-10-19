@@ -5,6 +5,7 @@ from argparse import Action, ArgumentParser
 from .. import SubCommandType
 from ..exporter import Export
 from ..downloader import Manager, QueryCountEnum
+from .. import strptime
 
 
 class SubCommand(ABC):
