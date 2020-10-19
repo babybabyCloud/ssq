@@ -2,13 +2,10 @@
 
 from abc import ABC, abstractmethod
 from argparse import Action, ArgumentParser
-from datetime import datetime
 from .. import SubCommandType
 from ..exporter import Export
 from ..downloader import Manager, QueryCountEnum
 
-
-_DATE_FORMAT = '%Y-%m-%d'
 
 class SubCommand(ABC):
     def __init__(self):
@@ -66,7 +63,3 @@ class SubCommandAction(Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, self.__sub_command_mapping[values])
-
-
-def strptime(date_string, format=_DATE_FORMAT):
-    return datetime.strptime(date_string, format).date()

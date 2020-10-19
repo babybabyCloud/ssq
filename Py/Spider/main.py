@@ -3,14 +3,27 @@
 import click
 import Spider.logging
 
+from datetime import date
+from . import strptime
+from .exporter import Export
+
 
 LOG_LEVEL_OPTS = ('NOTSET', 'DEBUG','INFO', 'WARN', 'WARNING', 'ERROR', 'FATAL', 'CRITICAL')
 QUERY_COUNT_OPTS = ('30', '50', '100')
 DB_FIEL_ARG_NAME = 'db_file'
 
 
+def validate_date(ctx: click.Context, param: click.Parameter, value: str) -> date:
+    """
+    Validate the date option value.
+    :param ctx: 
+    """
+    return strptime(*value)
+
+
+
 @click.group()
-@click.option('--log-level', 'log_level', 
+@click.option('--log-level', 'log_level', envvar="SSQ_LOG_LEVEL",
     type=click.Choice(LOG_LEVEL_OPTS, case_sensitive=False), help='The log level.')
 @click.option('--log-path', 'log_path', help='The path of the log.')
 @click.option('--log-config', Spider.logging.LOG_CONFIG_PATH_STR, help='The full path of the log json file.')
@@ -26,17 +39,19 @@ def main(ctx, **kwargs):
 
 
 @main.command()
-@click.option('--query-count', 'query_count', type=click.Choice(QUERY_COUNT_OPTS), required=True, 
-    help='The count need to pull.')
+@click.option('--query-count', 'query_count', default=QUERY_COUNT_OPTS[0], 
+    type=click.Choice(QUERY_COUNT_OPTS), required=True, help='The count need to pull.')
 @click.pass_context
 def download(ctx, query_count):
     from .downloader import Manager
     Manager.main(ctx.obj.get(DB_FIEL_ARG_NAME), query_count)
 
 
-# def parse_args():
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('sub_command', action=argumentsparser.SubCommandAction,
-#                         choices=[item.value for item in list(SubCommandType)])
-#     parser.add_argument('sub_args', nargs=argparse.REMAINDER)
-#     return parser.parse_args()
+@main.command()
+@click.option('--before', callback=validate_date, help='The date before for export: YYYY-MM-DD')
+@click.option('--after', callback=validate_date, help='The date after for export: YYYY-MM-DD')
+@click.option('--limit', type=int, help='The max counts for exporting')
+@click.option('--out', default='.', help='The output file')
+@click.argument('table', help='The name of tables for exporting')
+def export(**kwargs):
+    Export.main(**kwargs)
