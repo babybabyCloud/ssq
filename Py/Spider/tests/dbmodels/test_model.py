@@ -2,8 +2,8 @@
 
 import unittest
 from datetime import datetime
-from ..dboperator import new_session
-from ..dbmodels import model
+from Spider.dboperator import new_session
+from Spider.dbmodels import model
 
 _MOMORY_SQL_URL = 'sqlite:///:memory:'
 

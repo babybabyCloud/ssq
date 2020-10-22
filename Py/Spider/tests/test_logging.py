@@ -3,10 +3,15 @@
 import logging
 
 import unittest
-from .logging import LoggerFactory
+from ..logging import LoggerFactory
 
 
 class LoggerFactoryTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        LoggerFactory.init_log_config()
+
+
     def test_get_root_logger(self) -> None:
         root_logger = LoggerFactory.get_logger('default')
 

@@ -1,10 +1,9 @@
 # encoding: utf-8
 
 import unittest
-from . import DBHandler
-from . import new_session
+from Spider.dboperator import DBHandler, new_session
 import datetime
-from ..dbmodels import *
+from Spider.dbmodels import *
 
 class DBHandlerTest(unittest.TestCase):
 

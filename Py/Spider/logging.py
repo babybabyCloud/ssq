@@ -28,8 +28,7 @@ class LoggerFactory:
     _config: Dict[str, Dict] = None
     __DEFAULT_CONFIG_FILE = 'logging.json'
     __LOGGERS_KEY = 'loggers'
-    __LOCK = Lock()
-    __init = False
+
 
     @classmethod
     def init_log_config(cls, *, config_path: str = __DEFAULT_CONFIG_FILE, **kwargs) -> None:
@@ -37,19 +36,15 @@ class LoggerFactory:
         Init the log config
         :param config_path: The full path of config file.
         """
-        with cls.__LOCK:
-            if cls.__init:
-                return
-            path = config_path
-            if config_path == cls.__DEFAULT_CONFIG_FILE:
-                path = str(get_file_name(__file__, config_path))
-            with open(path) as f:
-                cls._config = cls._read_config(f)
-                dictConfig(cls._config)
-            
-            cls.log_config = LogConfig(**kwargs)
-            cls._reconfig_logger()
-            cls.__init == False
+        path = config_path
+        if config_path == cls.__DEFAULT_CONFIG_FILE:
+            path = str(get_file_name(__file__, config_path))
+        with open(path) as f:
+            cls._config = cls._read_config(f)
+            dictConfig(cls._config)
+        
+        cls.log_config = LogConfig(**kwargs)
+        cls._reconfig_logger()
 
     
     @classmethod
@@ -88,13 +83,7 @@ class LoggerFactory:
             log_level = cls.log_config.log_level
             if  log_level != None:
                 logger.setLevel(log_level)
-            for handler in logger.handlers:
-                if log_level != None:
-                    handler.setLevel(cls.log_config.log_level)
-                if isinstance(handler, logging.StreamHandler):
-                    if log_path := cls.log_config.log_path != None:
-                        handler.setStream(open(log_path, 'a+'))
-        
+            cls._process_handlers(logger, log_level)
 
     @staticmethod
     def _read_config(config_file: FileIO) -> Dict[str, Dict]:
@@ -107,3 +96,16 @@ class LoggerFactory:
             import json
             return json.load(config_file)
         return dict()
+
+    
+    @classmethod
+    def _process_handlers(cls, logger: logging.Logger, log_level: str) -> None:
+        """
+        Set log level and StreanHandler's target to the handlers
+        """
+        for handler in logger.handlers:
+            if log_level != None:
+                handler.setLevel(cls.log_config.log_level)
+            if isinstance(handler, logging.StreamHandler):
+                if log_path := cls.log_config.log_path != None:
+                    handler.setStream(open(log_path, 'a+'))

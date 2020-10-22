@@ -6,9 +6,8 @@ from Spider.logging import LoggerFactory
 # Init logger for UT.
 LoggerFactory.init_log_config()
 
-from .compute import *
-from .. import get_file_name
-from .. import strptime
+from Spider.analyse.compute import *
+from Spider import get_file_name, strptime
 
 
 _MEMORY_URL = 'sqlite:///:memory:'
