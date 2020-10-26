@@ -28,6 +28,7 @@ class ComputeTest(unittest.TestCase):
         cls.session.add_all(rbs)
         cls._default_limit = 30
         cls.session.commit()
+        cls.session.delete(cls.session.query(RecordBase).filter(RecordBase.id == -2).one())
 
     # unittest will run the test case by method name with ASCII order, this method need run after 
     # test_1_read_needed_compute_data, so add a '2' in the method name

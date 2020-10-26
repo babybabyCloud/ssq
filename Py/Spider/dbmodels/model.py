@@ -16,7 +16,7 @@ class TableFuncMixIn:
 class RecordBase(Base, TableFuncMixIn):
     __tablename__ = 'record_base'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     red1 = Column('red_1', Integer, nullable=False)
     red2 = Column('red_2', Integer, nullable=False)
     red3 = Column('red_3', Integer, nullable=False)
@@ -39,7 +39,7 @@ class RecordBase(Base, TableFuncMixIn):
 class RecordDetail(Base, TableFuncMixIn):
     __tablename__ = 'record_detail'
 
-    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True, index=True)
     week = Column(String(8))
     sales = Column(Integer)
     pool_money = Column(Integer)
@@ -55,7 +55,7 @@ class RecordDetail(Base, TableFuncMixIn):
 class RecordDetails(Base, TableFuncMixIn):
     __tablename__ = 'record_details'
 
-    id = Column(Integer, ForeignKey('record_detail.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('record_detail.id'), primary_key=True, index=True)
     type = Column(Integer, primary_key=True)
     type_num = Column(Integer)
     type_money = Column(Integer)
@@ -68,7 +68,7 @@ class RecordDetails(Base, TableFuncMixIn):
 class RecordsMean(Base, TableFuncMixIn):
     __tablename__ = 'records_mean'
 
-    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True, index=True)
     mean1 = Column('mean_1', Float)
     mean2 = Column('mean_2', Float)
     mean3 = Column('mean_3', Float)
