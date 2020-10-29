@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
-__all__ = ['tablemapping', 'RecordBase', 'RecordDetail', 'RecordDetails', 'RecordsMean']
+__all__ = ['tablemapping', 'RecordBase', 'RecordDetail', 'RecordDetails', 'RecordsMean', 'RecordData']
 
 class TableFuncMixIn:
     def columns(self):
@@ -32,8 +32,8 @@ class RecordBase(Base, TableFuncMixIn):
     headers = ['ID', 'RED1', 'RED2', 'RED3', 'RED4', 'RED5', 'RED6', 'BLUE', 'DATE']
 
     def __repr__(self):
-        return "<record_base(id=%s, red=[%s, %s, %s, %s, %s, %s], blue=%s, date=%s)>" % (self.id, self.red1, self.red2,
-                self.red3, self.red4, self.red5, self.red6, self.blue, self.date_)
+        return f"<record_base(id={self.id}, red=[{self.red1}, {self.red2}, {self.red3}, {self.red4}, {self.red5}, \
+            {self.red6}], blue={self.blue}, date={self.date_})>"
 
 
 class RecordDetail(Base, TableFuncMixIn):
@@ -48,8 +48,8 @@ class RecordDetail(Base, TableFuncMixIn):
     record_details = relationship('RecordDetails', back_populates='record_detail')
 
     def __repr__(self):
-        return "<record_detail(id=%s, week=%s, sales=%s, pool_money=%s, detail_link=%s)>" % (self.id, self.week, self.sales,
-                self.pool_money, self.detail_link)
+        return f"<record_detail(id={self.id}, week={self.week}, sales={self.sales}, pool_money={self.pool_money}, \
+            detail_link={self.detail_link})>"
 
 
 class RecordDetails(Base, TableFuncMixIn):
@@ -62,7 +62,8 @@ class RecordDetails(Base, TableFuncMixIn):
     record_detail = relationship('RecordDetail', uselist=False, back_populates='record_details')
 
     def __repr__(self):
-        return "<record_details(id=%s, type=%s, type_num=%s, type_money=%s)>" % (self.id, self.type, self.type_num, self.type_money)
+        return f"<record_details(id={self.id}, type={self.type}, type_num={self.type_num}, \
+            type_money={self.type_money})>"
 
 
 class RecordsMean(Base, TableFuncMixIn):
@@ -80,10 +81,30 @@ class RecordsMean(Base, TableFuncMixIn):
     record_base = relationship('RecordBase', uselist=False, back_populates='records_mean')
 
     def __repr__(self):
-        return "<records_mean(id=%s, means=[%s, %s, %s, %s, %s, %s], mean_blue=%s, type=%s)>" % (self.id, self.mean1, 
-                self.mean2, self.mean3, self.mean4, self.mean5, self.mean6, self.mean_blue, self.type)
+        return f"<records_mean(id={self.id}, means=[{self.mean1}, {self.mean2}, {self.mean3}, {self.mean4}, \
+            {self.mean5}, {self.mean6}], mean_blue={self.mean_blue}, type={self.type})>"
+
+
+class RecordData(Base, TableFuncMixIn):
+    __tablename__ = 'record_data'
+
+    id = Column(Integer, ForeignKey('record_base.id'), primary_key=True, index=True)
+    red_part_low = Column(Integer)
+    red_part_mid = Column(Integer)
+    red_part_high = Column(Integer)
+    blue_part = Column(Integer, comment="0 represents low part number, 1 represents high part num")
+    red_odd = Column(Integer)
+    red_even = Column(Integer)
+    blue_odd_even = Column(Integer, comment="0 represents even number, 1 represents odd number")
+
+    def __repr__(self):
+        return f"<record_data(id={self.id}, red_part=[{self.red_part_low}, {self.red_part_mid}, {self.red_part_high}], \
+            blue_part={self.blue_part}, red_odd:red_even={self.red_odd}:{self.red_even}, \
+            blue_odd_even={self.blue_odd_even}"
+
 
 tablemapping = {RecordBase.__tablename__: RecordBase, 
         RecordDetail.__tablename__: RecordDetail,
         RecordDetails.__tablename__: RecordDetails,
-        RecordsMean.__tablename__: RecordsMean}
+        RecordsMean.__tablename__: RecordsMean, 
+        RecordData.__tablename__: RecordData}

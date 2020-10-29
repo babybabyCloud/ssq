@@ -49,8 +49,8 @@ class RecordDetailTest(unittest.TestCase):
 
 class RecordDetailsTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self.session = new_session(_MOMORY_SQL_URL)
+    def setUpClass(cls):
+        cls.session = new_session(_MOMORY_SQL_URL)
 
     def test_record_details(self):
         rds = model.RecordDetails(id=2019014, type=1, type_num=12, type_money=6477986)
@@ -63,11 +63,11 @@ class RecordDetailsTest(unittest.TestCase):
 
 class RecordsMeanTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self.session = new_session(_MOMORY_SQL_URL)
+    def setUpClass(cls):
+        cls.session = new_session(_MOMORY_SQL_URL)
 
     def test_records_mean(self):
-        rb = model.RecordBase(id = -3, red1=1, red2=3, red3=10, red4=15, red5=16, red6=22, blue=8, date_=datetime.now().date())
+        rb = model.RecordBase(id=-3, red1=1, red2=3, red3=10, red4=15, red5=16, red6=22, blue=8, date_=datetime.now().date())
         rm = model.RecordsMean(id=-3, mean1=1, mean2=2, mean3=3, mean4=4, mean5=5, mean6=6, mean_blue=8, type=30, 
                                record_base=rb)
         self.session.add(rm)
@@ -78,3 +78,16 @@ class RecordsMeanTest(unittest.TestCase):
         self.assertEqual(rb.red3, record.record_base.red3)
 
 
+class RecordDataTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.session = new_session(_MOMORY_SQL_URL)
+
+    def test_record_data(self):
+        rd = model.RecordData(id=-3, red_part_low=2, red_part_mid=2, red_part_high=2, blue_part=1, red_odd=2, red_even=4, \
+            blue_odd_even=1)
+        self.session.add(rd)
+        self.session.commit()
+
+        record = self.session.query(model.RecordData).filter(model.RecordData.id == -3).one()
+        self.assertEqual(rd.blue_part,  record.blue_part)
