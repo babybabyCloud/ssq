@@ -46,7 +46,7 @@ class Manager:
 
 
     def start_compute(self):
-        logger.info('Start compute mean')
+        logger.info('Start computing')
 
         from ..analyse.compute import compute_means
         from ..dboperator import get_engine

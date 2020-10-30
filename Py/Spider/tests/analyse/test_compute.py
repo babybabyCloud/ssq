@@ -6,8 +6,8 @@ from Spider.logging import LoggerFactory
 # Init logger for UT.
 LoggerFactory.init_log_config()
 
-from Spider.analyse.compute import *
 from Spider import get_file_name, strptime
+from Spider.analyse.compute import *
 
 
 _MEMORY_URL = 'sqlite:///:memory:'
@@ -28,7 +28,8 @@ class ComputeTest(unittest.TestCase):
         cls.session.add_all(rbs)
         cls._default_limit = 30
         cls.session.commit()
-        cls.session.delete(cls.session.query(RecordBase).filter(RecordBase.id == -2).one())
+        cls.mean = ComputeMean(get_engine(), cls._default_limit)
+        # cls.session.delete(cls.session.query(RecordBase).filter(RecordBase.id == -2).one())
 
     # unittest will run the test case by method name with ASCII order, this method need run after 
     # test_1_read_needed_compute_data, so add a '2' in the method name
@@ -40,8 +41,7 @@ class ComputeTest(unittest.TestCase):
             next(data)
             for item in data:
                 csv_data.append(item)
-        engine = get_engine()
-        compute_means(engine, self._default_limit)
+        self.mean.compute_means()
         # calculate the data from csv
         for item in self.session.query(RecordsMean.id, RecordsMean.mean1).all():
             sum = 0
@@ -57,4 +57,4 @@ class ComputeTest(unittest.TestCase):
             # Won't test for error scenario
 
     def test_1_read_needed_compute_data(self):
-        self.assertEqual([2018098, 2018099, 2019001], read_needed_compute_data(self._default_limit, self.session))
+        self.assertEqual([2018098, 2018099, 2019001], self.mean.read_needed_compute_data(self.session))
