@@ -76,13 +76,31 @@ class ComputeMean(Compute):
         return [inner for outer in ids for inner in outer]
 
 
-class ComputeBase(Compute):
+class ComputeBaseInfo(Compute):
     """
     Compute the information in record_data table
     """
     def compute(self):
         logger.info("Start computing base information in recore_data table")
+        data = self._prepare_data()
+
+
+    def _prepare_data(self) -> pd.DataFrame:
+        """
+        Prepare the data according to record_data table
+        """
         df = pd.read_sql_query('select rb.* from record_base rb left join record_data rd on rb.ID = rd.id \
                 where rd.id ISNULL order by rb.ID;', self._engine).rename(str.upper, axis='columns')
         
-        df.loc[:, 'RED_1':'RED_6'].transform(lambda x: (x-1)//11)
+        reds = df.loc[:, 'RED_1':'RED_6']
+        blues = df.loc[:, 'BLUE']
+        roe = reds.transform(lambda x: x%2).aggregate(pd.Series.value_counts, axis=1).fillna(0).astype(int)\
+                .rename(columns={0:'RED_ODD', 1:'RED_EVEN'})
+        data = reds.transform(lambda x: (x-1)//11).aggregate(pd.Series.value_counts, axis=1).fillna(0).astype(int)\
+                .rename(columns={0:'RED_PART_LOW', 1:'RED_PART_MID', 2:'RED_PART_HIGH'})\
+                .assign(BLUE=blues.transform(lambda x: (x-1)//8), 
+                        RED_ODD=roe.loc[:, 'RED_ODD'],
+                        RED_EVEN=roe.loc[:, 'RED_EVEN'],
+                        BLUE_ODD_EVEN=blues.transform(lambda x: x%2))
+        logger.debug('Computed data %s', data)
+        return data
