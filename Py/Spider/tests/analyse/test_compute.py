@@ -53,6 +53,7 @@ class ComputeTest(unittest.TestCase):
                 if hit == self._default_limit:
                     break
             # Compare the mean calculated by above to read from table
+            print(item[0])
             self.assertEqual(sum / self._default_limit, item[1])
             # Won't test for error scenario
 

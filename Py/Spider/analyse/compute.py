@@ -41,10 +41,15 @@ class ComputeMean(Compute):
         means = list()
         for item in needed_computed_ids:
             data = df.loc[df['ID'] <= item].reset_index().tail(self._limit).loc[:, 'ID']
-            if all((diff_data := data.diff().fillna(1.0).isin([1.0]))) == False:
-                for index in diff_data[diff_data == False].index.values:
-                    if not str(df.at[index, 'ID']).endswith('001'):
-                        raise ValueError('Missing continuous ID at %s' %index)
+            # Get all ids' difference, fill the first with 1
+            diff = data.diff().fillna(1)
+            data = pd.DataFrame({'ID': data.astype(str).values, 'DIFF': diff.values})
+            # Get the difference are not 1, we think they aren't continuous'
+            tmp = data[data.loc[:, 'DIFF'] != 1]
+            # If the records aren't continuous and the id don't end with '001', they aren't truely continuous.
+            error = False if tmp.empty else not tmp.loc[:, 'ID'].str.endswith('001').all()
+            if error:
+                raise ValueError(f"Missing continuous ID at {tmp.loc[:, 'ID'].values}")
             mean = df.loc[df['ID'] <= item].reset_index().tail(self._limit).loc[:, 'RED_1':'BLUE'].mean()
             means.append(RecordsMean(id=item, mean1=mean['RED_1'], mean2=mean['RED_2'], mean3=mean['RED_3'], 
                                     mean4=mean['RED_4'], mean5=mean['RED_5'], mean6=mean['RED_6'], mean_blue=mean['BLUE'],
@@ -60,7 +65,7 @@ class ComputeMean(Compute):
         :param session: The DB session object
         :return: The ids.
         """
-        rb_limit_cte = session.query(RecordBase).order_by(RecordBase.id).limit(-1).offset(self._limit-1).cte()
+        rb_limit_cte = session.query(RecordBase).order_by(RecordBase.id).limit(-1).offset(self._limit).cte()
         ids = session.query(rb_limit_cte.c.id)\
             .select_from(outerjoin(rb_limit_cte, \
                                     RecordsMean, \
