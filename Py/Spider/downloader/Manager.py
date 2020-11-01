@@ -48,10 +48,10 @@ class Manager:
     def start_compute(self):
         logger.info('Start computing')
 
-        from ..analyse.compute import compute_means
+        from ..analyse import compute
         from ..dboperator import get_engine
 
-        compute_means(get_engine(), int(self._query_count))
+        compute(get_engine(), int(self._query_count))
 
 
 def main(*args):

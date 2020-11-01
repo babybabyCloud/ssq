@@ -82,3 +82,7 @@ class ComputeBase(Compute):
     """
     def compute(self):
         logger.info("Start computing base information in recore_data table")
+        df = pd.read_sql_query('select rb.* from record_base rb left join record_data rd on rb.ID = rd.id \
+                where rd.id ISNULL order by rb.ID;', self._engine).rename(str.upper, axis='columns')
+        
+        df.loc[:, 'RED_1':'RED_6'].transform(lambda x: (x-1)//11)
