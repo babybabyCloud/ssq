@@ -19,11 +19,7 @@ class ExportTest(unittest.TestCase):
         output = Export.outpath(input, '')
         self.assertEqual(input, output)
 
-    def test_outpath_with_ext(self):
+    def test_outpath_without_ext(self):
         input = '/home/vagrant/helloworld'
         output = Export.outpath(input, 'temp')
         self.assertEqual('%s/temp.csv' % input, output)
-
-
-if __name__ == '__main__':
-    unittest.main()

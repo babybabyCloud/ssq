@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from ..dboperator import *
-from ..dbmodels.model import RecordBase, RecordsMean
+from ..dbmodels.model import RecordBase, RecordsMean, RecordData
 import pandas as pd
 from Spider.logging import LoggerFactory
 from sqlalchemy import outerjoin, and_
@@ -94,6 +94,7 @@ class ComputeBaseInfo(Compute):
         data = self._prepare_data()
         rbs = [RecordData.create_instance_from_dataframe(row) for row in data.itertuples()]
         self._session.add_all(rbs)
+        self._session.commit()
 
 
     def _prepare_data(self) -> pd.DataFrame:

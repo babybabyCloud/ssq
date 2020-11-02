@@ -17,6 +17,3 @@ class DBHandlerTest(unittest.TestCase):
         self.session.commit()
         record = self.session.query(RecordBase).filter(RecordBase.id == -2).one()
         self.assertEqual(2, record.red2)
-
-if __name__ == '__main__':
-    unittest.main()
