@@ -13,7 +13,7 @@ from Spider.analyse.compute import *
 _MEMORY_URL = 'sqlite:///:memory:'
 
 
-class ComputeTest(unittest.TestCase):
+class ComputeMeanTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rbs = list()
@@ -59,3 +59,12 @@ class ComputeTest(unittest.TestCase):
 
     def test_1_read_needed_compute_data(self):
         self.assertEqual([2018098, 2018099, 2019001], self.mean.read_needed_compute_data(self.session))
+
+
+class ComputeBaseInfo(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls._session = new_session(_MEMORY_URL)
+
+    def test_haha(self):
+        print(self._session.query(RecordBase).all())

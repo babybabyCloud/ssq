@@ -103,6 +103,16 @@ class RecordData(Base, TableFuncMixIn):
             blue_odd_even={self.blue_odd_even}"
 
 
+    @staticmethod
+    def create_instance_from_dataframe(data: tuple):
+        """
+        Create a instance of RecordData
+        :param data: Dirived from DataFrame.itertuples
+        """
+        return RecordData(id=data.ID, red_part_low=data.RED_PART_LOW, red_part_mid=data.RED_PART_MID, 
+                red_part_high=data.RED_PART_HIGH, blue_part=data.BLUE, red_odd=data.RED_ODD, red_even=data.RED_EVEN, 
+                blue_odd_even=data.BLUE_ODD_EVEN)
+
 tablemapping = {RecordBase.__tablename__: RecordBase, 
         RecordDetail.__tablename__: RecordDetail,
         RecordDetails.__tablename__: RecordDetails,

@@ -19,23 +19,32 @@ class Compute:
     Base class for computing.
     This aims to provide a common constructor
     """
-    def __init__(self, engine: Engine, limit: int = _DEFAULT_LIMIT, /):
+    def __init__(self, engine: Engine, /):
         """
         :param engine: The DB engine object
-        :param limit: The type of the limit to be computed
         """
         self._engine = engine
-        self._limit = limit
+        self._session = new_session_with_engine(self._engine)
+
+
+    def __del__(self):
+        """
+        Close the session object.
+        """
+        self._session.close()
 
 
 class ComputeMean(Compute):
+    def __init__(self, engine: Engine, limit: int = _DEFAULT_LIMIT):
+        super().__init__(engine)
+        self._limit = limit
+
     def compute_means(self):
         """
         Compute the mean
         """
         logger.info('Start to compute mean')
-        session = new_session_with_engine(self._engine)
-        needed_computed_ids = self.read_needed_compute_data(session)
+        needed_computed_ids = self.read_needed_compute_data(self._session)
         logger.debug('The ids: %s will be computed, the mean for type %d' %(needed_computed_ids, self._limit))
         df = pd.read_sql_query('select * from record_base order by id', self._engine).rename(str.upper, axis='columns')
         means = list()
@@ -54,8 +63,8 @@ class ComputeMean(Compute):
             means.append(RecordsMean(id=item, mean1=mean['RED_1'], mean2=mean['RED_2'], mean3=mean['RED_3'], 
                                     mean4=mean['RED_4'], mean5=mean['RED_5'], mean6=mean['RED_6'], mean_blue=mean['BLUE'],
                                     type=self._limit))
-        session.add_all(means)
-        session.commit()
+        self._session.add_all(means)
+        self._session.commit()
         logger.info('Mean compute complete!')
 
 
@@ -65,7 +74,7 @@ class ComputeMean(Compute):
         :param session: The DB session object
         :return: The ids.
         """
-        rb_limit_cte = session.query(RecordBase).order_by(RecordBase.id).limit(-1).offset(self._limit).cte()
+        rb_limit_cte = session.query(RecordBase).order_by(RecordBase.id).limit(-1).offset(self._limit-1).cte()
         ids = session.query(rb_limit_cte.c.id)\
             .select_from(outerjoin(rb_limit_cte, \
                                     RecordsMean, \
@@ -83,6 +92,8 @@ class ComputeBaseInfo(Compute):
     def compute(self):
         logger.info("Start computing base information in recore_data table")
         data = self._prepare_data()
+        rbs = [RecordData.create_instance_from_dataframe(row) for row in data.itertuples()]
+        self._session.add_all(rbs)
 
 
     def _prepare_data(self) -> pd.DataFrame:
@@ -101,6 +112,7 @@ class ComputeBaseInfo(Compute):
                 .assign(BLUE=blues.transform(lambda x: (x-1)//8), 
                         RED_ODD=roe.loc[:, 'RED_ODD'],
                         RED_EVEN=roe.loc[:, 'RED_EVEN'],
-                        BLUE_ODD_EVEN=blues.transform(lambda x: x%2))
+                        BLUE_ODD_EVEN=blues.transform(lambda x: x%2),
+                        ID=df.loc[:, 'ID'])
         logger.debug('Computed data %s', data)
         return data
