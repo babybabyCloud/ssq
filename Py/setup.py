@@ -7,7 +7,7 @@ setup(
     version='0.4',
     packages=find_packages(),
     install_requires=[
-        'selenium>=3.141.0', 
+        'selenium==3.141.0', 
         'SQLAlchemy==1.3.20', 
         'click==7.1.2',
         'pandas==1.1.3'

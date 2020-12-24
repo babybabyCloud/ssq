@@ -1,11 +1,17 @@
-FROM python:3.8-slim
+FROM python:3.8-slim AS firefox
+
+ARG firefoxVersion=84.0.1
+ARG firefoxTarFile=firefox-${firefoxVersion}.tar.bz2
+
+RUN apt-get update && \
+    apt-get install -y wget tar bzip2
 
 # Install firefox
-RUN apt-get update && \
-    apt-get install -y firefox-esr && \
-    apt-get clean && \
-    apt-get autoremove && \ 
-    rm -rf /var/lib/apt/lists/*
+RUN wget https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0.1/linux-x86_64/en-US/${firefoxTarFile} > /dev/null && \
+    tar -xjf ${firefoxTarFile} -C /usr/lib/
+
+FROM python:3.8-slim
+COPY --from=firefox /usr/lib/firefox /usr/lib/firefox 
 
 RUN mkdir -p /tmp/ssq/Spider
 
@@ -14,9 +20,9 @@ COPY Py/Spider /tmp/ssq/Spider
 COPY Py/setup.py /tmp/ssq/
 
 # Install application
-RUN pip install pip --upgrade && \
+RUN pip install --upgrade pip && \
     cd /tmp/ssq && \
-    python /tmp/ssq/setup.py install && \
+    python setup.py install && \
     rm -rf /tmp/ssq
 
 # Add user
@@ -31,4 +37,4 @@ WORKDIR /home/ssq
 
 ENTRYPOINT ["ssq"]
 
-CMD ["download", "--db-file", "/data/ssq.db", "--query-count", "30"]
+CMD ["--db-file", "/data/ssq.db", "download", "--query-count", "30"]
