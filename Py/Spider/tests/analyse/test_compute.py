@@ -13,7 +13,7 @@ from Spider.analyse.compute import *
 _MEMORY_URL = 'sqlite:///:memory:'
 
 
-class ComputeMeanTest(unittest.TestCase):
+class Compute1MeanTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rbs = list()
@@ -33,7 +33,7 @@ class ComputeMeanTest(unittest.TestCase):
 
     # unittest will run the test case by method name with ASCII order, this method need run after 
     # test_1_read_needed_compute_data, so add a '2' in the method name
-    def test_compute_means(self):
+    def test_2_compute_means(self):
         csv_data = list()
         with open(get_file_name(__file__, 'record_base.csv')) as f:
             data = csv.reader(f)
@@ -56,17 +56,17 @@ class ComputeMeanTest(unittest.TestCase):
             self.assertEqual(sum / self._default_limit, item[1])
             # Won't test for error scenario
 
-    def test_read_needed_compute_data(self):
+    def test_1_read_needed_compute_data(self):
         self.assertEqual([2018098, 2018099, 2019001], self.mean.read_needed_compute_data(self.session))
 
 
-class ComputeBaseInfoTest(unittest.TestCase):
+class Compute2BaseInfoTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls._engine = get_engine()
         cls.cbi = ComputeBaseInfo(cls._engine)
 
-    def test_record_data(self):
+    def test_compute_data(self):
         self.cbi.compute()
         rd = new_session_with_engine(self._engine).query(RecordData).filter(RecordData.id == 2018097).one()
         self.assertEqual(2, rd.red_part_low)

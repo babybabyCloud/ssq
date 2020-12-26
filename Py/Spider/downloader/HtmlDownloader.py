@@ -71,6 +71,7 @@ class DetailsPageDownloader(HtmlDownloader, DetailsPageDataExtractor):
         self.context_data.response.setdefault('data', list())
         self.context_data.request['element_class'] = 'table/tbody/tr'
         for item in details:
+            logger.info("Get link %s" %item.link)
             self.browser.get(item.link)
             self.context_data.request['page'] = self._wait.until(expected.visibility_of_element_located(
                 (By.CLASS_NAME, element_cls)))

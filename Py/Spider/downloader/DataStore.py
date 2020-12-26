@@ -35,8 +35,8 @@ class BasePageDataStore(DataStore):
             record_base.red1, record_base.red2, record_base.red3, record_base.red4, record_base.red5, \
                     record_base.red6 = row.reds
             insert_base(record_base, self._session)
-            record_detail = RecordDetail(id=row.id, week=row.date[-2:-1], sales=row.total, pool_money=row.pool, \
-                    detail_link=row.detail_link)
+            record_detail = RecordDetail(id=row.id, week=row.date[-2:-1], sales=int(row.total.replace(',', '_')), \
+                    pool_money=int(row.pool.replace(',', '_')), detail_link=row.detail_link)
             insert_detail(record_detail, self._session)
             logger.debug('Insert record_base %s and record_details %s' %(record_base, record_detail))
             details = SSQDetails(id=record_detail.id, link=record_detail.detail_link, type=None, type_num=None, \
