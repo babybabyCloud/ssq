@@ -101,9 +101,11 @@ class ComputeBaseInfo(Compute):
         """
         Prepare the data according to record_data table
         """
-        df = pd.read_sql_query('select rb.* from record_base rb left join record_data rd on rb.ID = rd.id \
+        df: pd.DataFrame = pd.read_sql_query('select rb.* from record_base rb left join record_data rd on rb.ID = rd.id \
                 where rd.id ISNULL order by rb.ID;', self._engine).rename(str.upper, axis='columns')
-        
+        if df.empty:
+            return df
+
         reds = df.loc[:, 'RED_1':'RED_6']
         blues = df.loc[:, 'BLUE']
         roe = reds.transform(lambda x: x%2).aggregate(pd.Series.value_counts, axis=1).fillna(0).astype(int)\
