@@ -77,12 +77,15 @@ class ComputeMean(Compute):
         rb_limit_cte = session.query(RecordBase).order_by(RecordBase.id).limit(-1).offset(self._limit-1).cte()
         ids = session.query(rb_limit_cte.c.id)\
             .select_from(outerjoin(rb_limit_cte, \
-                                    RecordsMean, \
-                                    and_(rb_limit_cte.c.id == RecordsMean.id, RecordsMean.type == self._limit)))\
+                    RecordsMean, \
+                    and_(rb_limit_cte.c.id == RecordsMean.id, RecordsMean.type == self._limit)))\
             .filter(RecordsMean.id == None)\
             .order_by(rb_limit_cte.c.id)\
             .all()
-        return [inner for outer in ids for inner in outer]
+        need_compute = [inner for outer in ids for inner in outer]
+        
+        logger.debug(need_compute)
+        return need_compute
 
 
 class ComputeBaseInfo(Compute):

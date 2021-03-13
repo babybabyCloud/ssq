@@ -32,8 +32,8 @@ class RecordBase(Base, TableFuncMixIn):
     headers = ['ID', 'RED1', 'RED2', 'RED3', 'RED4', 'RED5', 'RED6', 'BLUE', 'DATE']
 
     def __repr__(self):
-        return f"<record_base(id={self.id}, red=[{self.red1}, {self.red2}, {self.red3}, {self.red4}, {self.red5}, \
-            {self.red6}], blue={self.blue}, date={self.date_})>"
+        return f'<record_base(id={self.id}, red=[{self.red1}, {self.red2}, {self.red3}, {self.red4}, {self.red5}, '\
+                f'{self.red6}], blue={self.blue}, date={self.date_})>'
 
 
 class RecordDetail(Base, TableFuncMixIn):
@@ -48,8 +48,8 @@ class RecordDetail(Base, TableFuncMixIn):
     record_details = relationship('RecordDetails', back_populates='record_detail')
 
     def __repr__(self):
-        return f"<record_detail(id={self.id}, week={self.week}, sales={self.sales}, pool_money={self.pool_money}, \
-            detail_link={self.detail_link})>"
+        return f'<record_detail(id={self.id}, week={self.week}, sales={self.sales}, pool_money={self.pool_money}, '\
+                f'detail_link={self.detail_link})>'
 
 
 class RecordDetails(Base, TableFuncMixIn):
@@ -62,8 +62,8 @@ class RecordDetails(Base, TableFuncMixIn):
     record_detail = relationship('RecordDetail', uselist=False, back_populates='record_details')
 
     def __repr__(self):
-        return f"<record_details(id={self.id}, type={self.type}, type_num={self.type_num}, \
-            type_money={self.type_money})>"
+        return f'<record_details(id={self.id}, type={self.type}, type_num={self.type_num}, '\
+                f'type_money={self.type_money})>'
 
 
 class RecordsMean(Base, TableFuncMixIn):
@@ -81,8 +81,8 @@ class RecordsMean(Base, TableFuncMixIn):
     record_base = relationship('RecordBase', uselist=False, back_populates='records_mean')
 
     def __repr__(self):
-        return f"<records_mean(id={self.id}, means=[{self.mean1}, {self.mean2}, {self.mean3}, {self.mean4}, \
-            {self.mean5}, {self.mean6}], mean_blue={self.mean_blue}, type={self.type})>"
+        return f'<records_mean(id={self.id}, means=[{self.mean1}, {self.mean2}, {self.mean3}, {self.mean4}, '\
+                f'{self.mean5}, {self.mean6}], mean_blue={self.mean_blue}, type={self.type})>'
 
 
 class RecordData(Base, TableFuncMixIn):

@@ -8,21 +8,28 @@ from . import strptime
 
 
 LOG_LEVEL_OPTS = ('NOTSET', 'DEBUG','INFO', 'WARN', 'WARNING', 'ERROR', 'FATAL', 'CRITICAL')
-QUERY_COUNT_OPTS = ('30', '50', '100')
 DB_FIEL_ARG_NAME = 'db_file'
 
 
-def validate_date(ctx: click.Context, param: click.Parameter, value: str, format: str = _DATE_FORMAT) -> date:
+def format_date(ctx: click.Context, param: click.Parameter, value: str) -> date:
     """
     Validate the date option value.
     :param ctx: 
     """
-    return strptime(value, format) if value else None
+    return strptime(value, _DATE_FORMAT) if value else None
+
+
+def check_count(ctx: click.Context, param: click.Parameter, value: int) -> int:
+    """
+
+    """
+    assert 0 < value and value <= 100
+    return value
 
 
 @click.group()
 @click.option('--log-level', 'log_level', envvar="SSQ_LOG_LEVEL",
-    type=click.Choice(LOG_LEVEL_OPTS, case_sensitive=False), help='The log level.')
+        type=click.Choice(LOG_LEVEL_OPTS, case_sensitive=False), help='The log level.')
 @click.option('--log-path', 'log_path', help='The path of the log.')
 @click.option('--log-config', Spider.logging.LOG_CONFIG_PATH_STR, help='The full path of the log json file.')
 @click.option('--db-file', DB_FIEL_ARG_NAME, required=True, help='The path of the the SQLite DB file.')
@@ -37,8 +44,8 @@ def main(ctx, **kwargs):
 
 
 @main.command()
-@click.option('--query-count', 'query_count', default=QUERY_COUNT_OPTS[0], 
-    type=click.Choice(QUERY_COUNT_OPTS), required=True, help='The count need to pull.')
+@click.option('--query-count', 'query_count', callback=check_count, required=True, type=int,
+        help='The count need to pull. This greater than 0 and less than 101')
 @click.pass_context
 def download(ctx, query_count: str):
     from .downloader import Manager
@@ -46,8 +53,8 @@ def download(ctx, query_count: str):
 
 
 @main.command()
-@click.option('--before', callback=validate_date, help='The date before for export: YYYY-MM-DD')
-@click.option('--after', callback=validate_date, help='The date after for export: YYYY-MM-DD')
+@click.option('--before', callback=format_date, help='The date before for export: YYYY-MM-DD')
+@click.option('--after', callback=format_date, help='The date after for export: YYYY-MM-DD')
 @click.option('--limit', type=int, help='The max counts for exporting')
 @click.option('--out', default='.', help='The output file')
 @click.argument('table')

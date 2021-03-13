@@ -2,6 +2,9 @@
 
 from datetime import date, datetime
 from enum import Enum
+from typing import Coroutine, List
+
+import asyncio
 
 
 _DATE_FORMAT = '%Y-%m-%d'
@@ -26,3 +29,12 @@ def strptime(date_string, format=_DATE_FORMAT) -> date:
 class SubCommandType(Enum):
     DOWNLOAD = 'download'
     EXPORT = 'export'
+
+
+async def run_async(aws: List[Coroutine]):
+    """
+    A wrapper for asyncio.gather
+
+    :param aws: A list of coroutine
+    """
+    await asyncio.gather(*aws)
