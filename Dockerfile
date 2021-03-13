@@ -1,11 +1,5 @@
-FROM python:3.8-slim
+FROM python:3.9.2-slim
 
-# Install firefox
-RUN apt-get update && \
-    apt-get install -y firefox-esr && \
-    apt-get clean && \
-    apt-get autoremove && \ 
-    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /tmp/ssq/Spider
 
@@ -14,8 +8,9 @@ COPY Py/Spider /tmp/ssq/Spider
 COPY Py/setup.py /tmp/ssq/
 
 # Install application
-RUN pip install pip --upgrade && \
+RUN pip install pip --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple && \
     cd /tmp/ssq && \
+    pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
     python /tmp/ssq/setup.py install && \
     rm -rf /tmp/ssq
 
@@ -31,4 +26,4 @@ WORKDIR /home/ssq
 
 ENTRYPOINT ["ssq"]
 
-CMD ["download", "--db-file", "/data/ssq.db", "--query-count", "30"]
+CMD ["--db-file", "/data/ssq.db", "download", "--query-count", "30"]
